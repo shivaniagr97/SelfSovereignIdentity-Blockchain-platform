@@ -6,6 +6,10 @@
 
 const { ChaincodeStub, ClientIdentity } = require('fabric-shim');
 const { SsiSmartContractContract } = require('..');
+let Holder = require('../lib/holder.js');
+let Verifier = require('../lib/verifier.js');
+let Issuer = require('../lib/issuer.js');
+let Identity = require('../lib/identity.js');
 const winston = require('winston');
 
 const chai = require('chai');
@@ -36,10 +40,54 @@ describe('SsiSmartContractContract', () => {
     let ctx;
 
     beforeEach(() => {
+
+        let holder = {};
+        holder.firstName = 'shivani';
+        holder.lastName = 'agrawal';
+        holder.userID = 'ashivani997';
+        holder.password = '12345';
+        holder.dateOfBirth = '09/07/1997';
+        holder.address = 'B318, new LH, NITW';
+        holder.city = 'warangal';
+        holder.state = 'telangana';
+        holder.pinCode = '506004';
+        holder.contact = '9406474464';
+        holder.email = 'ashivani997@gmail.com';
+        holder.accessRights = {};
+        holder.trustedContacts = [];
+
+        let issuer = {};
+        issuer.issuerID = 'issuer1';
+        issuer.password = 'pass1';
+        issuer.issuerType = 'passport';
+        issuer.city = 'warangal';
+        issuer.state = 'telangana';
+        issuer.pinCode = '506004';
+        issuer.contact = '1234567890';
+        issuer.email = 'issuer@gov.in';
+
+        let verifier = {};
+        verifier.verifierID = 'verifier1';
+        verifier.password = 'pass1';
+        verifier.contact = '9089786751';
+        verifier.email = 'verifier@gmail.com';
+        verifier.docTypes = [];
+
+        let identity = {};
+        identity.holderID = 'ashivani997';
+        identity.issuerID = 'issuer';
+        identity.documentID = 'id1';
+        identity.documentType = 'passport';
+        identity.document = 'hashed document';
+
         contract = new SsiSmartContractContract();
         ctx = new TestContext();
         ctx.stub.getState.withArgs('1001').resolves(Buffer.from('{"value":"ssi smart contract 1001 value"}'));
         ctx.stub.getState.withArgs('1002').resolves(Buffer.from('{"value":"ssi smart contract 1002 value"}'));
+        ctx.stub.getState.withArgs('ashivani997').resolves(Buffer.from(JSON.stringify(holder)));
+        ctx.stub.getState.withArgs('issuer1').resolves(Buffer.from(JSON.stringify(issuer)));
+        ctx.stub.getState.withArgs('verifier1').resolves(Buffer.from(JSON.stringify(verifier)));
+        // ctx.stub.getState.withArgs('id1').resolves(Buffer.from(JSON.stringify(identity)));
     });
 
     describe('#ssiSmartContractExists', () => {
@@ -103,6 +151,13 @@ describe('SsiSmartContractContract', () => {
             await contract.deleteSsiSmartContract(ctx, '1003').should.be.rejectedWith(/The ssi smart contract 1003 does not exist/);
         });
 
+    });
+
+    describe('#initLedger', async () => {
+        it('should update the result in the global state', async () => {
+            let result = await contract.initLedger(ctx);
+
+        });
     });
 
 });
