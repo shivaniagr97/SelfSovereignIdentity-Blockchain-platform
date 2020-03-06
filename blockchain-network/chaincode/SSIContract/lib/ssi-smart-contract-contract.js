@@ -171,6 +171,7 @@ class SsiSmartContractContract extends Contract {
         let trustedContacts = [];
         let issueRequests = [];
         let verifyRequests = [];
+        let requesters = {};
 
         let holder = await new Holder(args.firstName, args.lastName, args.userID, args.password, args.dateOfBirth,
             args.address, args.city, args.state, args.pinCode, args.contact, args.email);
@@ -179,6 +180,7 @@ class SsiSmartContractContract extends Contract {
         holder.trustedContacts = trustedContacts;
         holder.issueRequests = issueRequests;
         holder.verifyRequests = verifyRequests;
+        holder.requesters = requesters;
 
         await ctx.stub.putState(holder.userID, Buffer.from(JSON.stringify(holder)));
 
@@ -461,6 +463,151 @@ class SsiSmartContractContract extends Contract {
         throw new Error(`Invalid Verify Request`);
     }
 
+    /**
+     *
+     * @param ctx
+     * @param args
+     * @returns {Promise<string>}
+     */
+    async requestAccess(ctx, args) {
+        args = JSON.parse(args);
+        let requesterExists = await this.assetExists(ctx, args.requesterID);
+        let holderExists = await this.assetExists(ctx, args.holderID);
+        if (requesterExists && holderExists) {
+            let holderAsBytes = await ctx.stub.getState(args.holderID);
+            let holder = JSON.parse(holderAsBytes);
+            let requesters = holder.requesters;
+            requesters[args.requesterID].push(args.documentsRequested);
+
+            await ctx.stub.putState(holder.userID, Buffer.from(JSON.stringify(holder)));
+
+            let response = `the request to access the documents has been submitted with the holder`;
+            return response;
+        }
+        throw new Error(`this requester with id ${args.requesterID} or the holder with id ${args.holderID} doesn't exist`)
+    }
+
+    /**
+     *
+     * @param ctx
+     * @param args
+     * @returns {Promise<string>}
+     */
+    async grantAccess(ctx, args) {
+        args = JSON.parse(args);
+        let requesterExists = await this.assetExists(ctx, args.requesterID);
+        let holderExists = await this.assetExists(ctx, args.holderID);
+        if (requesterExists && holderExists) {
+            let holderAsBytes = await ctx.stub.getState(args.holderID);
+            let holder = JSON.stringify(holderAsBytes);
+
+            //remove requester from list
+            let requesters = holder.requesters;
+            delete requesters[args.requesterID];
+            holder.requesters = requesters;
+
+            //add permissions
+            let documentID;
+            for (documentID in args.permissionedIDs) {
+                holder.accessRights[documentID].push(args.requesterID);
+            }
+
+            await ctx.stub.putState(args.holderID, Buffer.from(JSON.stringify(holder)));
+
+            let response = `Access has been provided to the requester with the id ${args.requesterId}`;
+            return response;
+        }
+        throw new Error(`this requester with id ${args.requesterID} or the holder with id ${args.holderID} doesn't exist`)
+    }
+
+    /**
+     *
+     * @param ctx
+     * @param args
+     * @returns {Promise<string>}
+     */
+    async revokeAccess(ctx, args) {
+        args = JSON.parse(args);
+        let requesterExists = await this.assetExists(ctx, args.requesterID);
+        let holderExists = await this.assetExists(ctx, args.holderID);
+        if (requesterExists && holderExists) {
+            let holderAsBytes = await ctx.stub.getState(args.holderID);
+            let holder = JSON.stringify(holderAsBytes);
+            let accessRights = holder.accessRights;
+            if (args.requesterID in accessRights[args.documentID]) {
+                let index = accessRights[args.documentID].indexOf(args.requesterID);
+                accessRights[args.documentID].splice(index, 1);
+                holder.accessRights = accessRights;
+            }
+            await ctx.stub.putState(args.holderID, Buffer.from(JSON.stringify(holder)));
+
+            let response = `Access has been revoked to the requester with the id ${args.requesterId} for document
+            ${args.documentID}`;
+            return response;
+        }
+        throw new Error(`this requester with id ${args.requesterID} or the holder with id ${args.holderID} doesn't exist`)
+    }
+
+    /**
+     *
+     * @param ctx
+     * @param objectType
+     * @returns {Promise<string>}
+     */
+    async queryWithObjectType(ctx, objectType) {
+        let queryString = {
+            selector: {
+                type: objectType
+            }
+        };
+
+        return await this.queryWithQueryString(ctx, queryString);
+    }
+
+    /**
+     *
+     * @param ctx
+     * @param queryString
+     * @returns {Promise<string>}
+     */
+    async queryWithQueryString(ctx, queryString) {
+
+        console.log('query String');
+        console.log(JSON.stringify(queryString));
+
+        let resultsIterator = await ctx.stub.getQueryResult(queryString);
+
+        let allResults = [];
+
+        // eslint-disable-next-line no-constant-condition
+        while (true) {
+            let res = await resultsIterator.next();
+
+            if (res.value && res.value.value.toString()) {
+                let jsonRes = {};
+
+                console.log(res.value.value.toString('utf8'));
+
+                jsonRes.Key = res.value.key;
+
+                try {
+                    jsonRes.Record = JSON.parse(res.value.value.toString('utf8'));
+                } catch (err) {
+                    console.log(err);
+                    jsonRes.Record = res.value.value.toString('utf8');
+                }
+
+                allResults.push(jsonRes);
+            }
+            if (res.done) {
+                console.log('end of data');
+                await resultsIterator.close();
+                console.info(allResults);
+                console.log(JSON.stringify(allResults));
+                return JSON.stringify(allResults);
+            }
+        }
+    }
 
     /**
      *
@@ -471,6 +618,23 @@ class SsiSmartContractContract extends Contract {
     async assetExists(ctx, id) {
         const buffer = await ctx.stub.getState(id);
         return (!!buffer && buffer.length > 0);
+    }
+
+    /**
+     *
+     * @param ctx
+     * @param args
+     * @returns {Promise<void>}
+     */
+    async deleteAsset(ctx, args) {
+        args = JSON.parse(args);
+        let assetExists = await this.assetExists(ctx, args.assetId);
+        if (assetExists) {
+            await ctx.stub.deleteState(args.assetId);
+            let response = `asset with id ${args.assetId} has been deleted`;
+        } else {
+            throw new Error(`No such asset with id ${args.assetId}`);
+        }
     }
 }
 
