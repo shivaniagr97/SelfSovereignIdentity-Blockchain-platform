@@ -214,6 +214,9 @@ class SsiSmartContractContract extends Contract {
      * @param args
      * @returns {Promise<string>}
      */
+    /*
+    TODO : Add method to request verify authority for documents
+     */
     async createVerifier(ctx, args) {
         args = JSON.parse(args);
 
@@ -275,13 +278,13 @@ class SsiSmartContractContract extends Contract {
      * @param requestID
      * @returns {Promise<string>}
      */
-    async issueIdentity(ctx, args, requestID) {
+    async issueIdentity(ctx, args) {
         args = JSON.parse(args);
 
         let documentExists = await this.assetExists(ctx, args.documentID);
         let holderExists = await this.assetExists(ctx, args.holderID);
         let issuerExists = await this.assetExists(ctx, args.issuerID);
-        let issueRequestExists = await this.assetExists(ctx, requestID);
+        let issueRequestExists = await this.assetExists(ctx, args.requestID);
 
         if (documentExists) {
             throw new Error(`Document with document id ${args.documentID} already exists in the world state`);
@@ -298,8 +301,8 @@ class SsiSmartContractContract extends Contract {
         let issuerAsBytes = await ctx.stub.getState(args.issuerID);
         let issuer = JSON.parse(issuerAsBytes);
         let issueRequests = issuer.issueRequests;
-        const index = issueRequests.indexOf(requestID);
-        if (issuer.issuerType !== args.documentType || !issueRequestExists || index == -1) {
+        const index = issueRequests.indexOf(args.requestID);
+        if (issuer.issuerType !== args.documentType || !issueRequestExists || index === -1) {
             throw new Error(`Issuer with issuer id ${args.issuerID} does not have access to issue this document`);
         }
 
@@ -318,7 +321,7 @@ class SsiSmartContractContract extends Contract {
         await ctx.stub.putState(holder.userID, Buffer.from(JSON.stringify(holder)));
 
         //mark issueRequest as completed
-        let issueRequestAsBytes = await ctx.stub.getState(requestID);
+        let issueRequestAsBytes = await ctx.stub.getState(args.requestID);
         let issueRequest = JSON.parse(issueRequestAsBytes);
         issueRequest.status = 'accepted';
         issueRequest.documentID = args.documentID;
@@ -391,7 +394,7 @@ class SsiSmartContractContract extends Contract {
             let issuerAsBytes = await ctx.stub.getState(issuerID);
             let issuer = JSON.parse(issuerAsBytes);
 
-            if (issuer.issuerType == documentType) {
+            if (issuer.issuerType === documentType) {
                 //create issue request
                 let issueRequest = await new IssueRequest(userID, issuerID, documentType, timeStamp);
                 issueRequest.status = 'processing';
@@ -414,7 +417,7 @@ class SsiSmartContractContract extends Contract {
             }
         }
 
-        throw new Error(`Invalid Issue Request`);
+        throw new Error('Invalid Issue Request');
     }
 
     /**
@@ -481,8 +484,7 @@ class SsiSmartContractContract extends Contract {
 
             await ctx.stub.putState(holder.userID, Buffer.from(JSON.stringify(holder)));
 
-            let response = `the request to access the documents has been submitted with the holder`;
-            return response;
+            return `the request to access the documents has been submitted with the holder`;
         }
         throw new Error(`this requester with id ${args.requesterID} or the holder with id ${args.holderID} doesn't exist`)
     }
