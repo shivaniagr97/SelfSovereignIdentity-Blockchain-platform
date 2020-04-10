@@ -8,6 +8,7 @@ class IssueRequest {
      * @param issuerID
      * @param documentType
      * @param timeStamp
+     * @param requestId
      * @returns {IssueRequest}
      */
     constructor(holderID, issuerID, documentType, timeStamp,requestId) {

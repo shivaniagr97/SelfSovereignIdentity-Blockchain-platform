@@ -8,6 +8,7 @@ class VerifyRequest {
      * @param verifierID
      * @param documentID
      * @param timeStamp
+     * @param requestId
      * @returns {IssueRequest}
      */
     constructor(holderID, verifierID, documentID, timeStamp, requestId) {
