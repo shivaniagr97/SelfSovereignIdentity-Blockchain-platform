@@ -16,6 +16,8 @@ var issueIdentity = require('./routes/issueIdentity');
 var requestAccess = require('./routes/requestAccess');
 var revokeAccess = require('./routes/revokeAccess');
 var verifyIdentity = require('./routes/verifyIdentity');
+var verifyPassword = require('./routes/verifyPassword');
+var logOut = require('./routes/logOut');
 
 var app = express();
 const cors = require('cors');
@@ -42,7 +44,8 @@ app.use('/issueIdentity', issueIdentity);
 app.use('/requestAccess', requestAccess);
 app.use('/revokeAccess', revokeAccess);
 app.use('/verifyIdentity', verifyIdentity);
-
+app.use('/verifyPassword', verifyPassword);
+app.use('/logOut', logOut);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
