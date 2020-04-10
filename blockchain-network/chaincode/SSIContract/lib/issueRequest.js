@@ -10,12 +10,12 @@ class IssueRequest {
      * @param timeStamp
      * @returns {IssueRequest}
      */
-    constructor(holderID, issuerID, documentType, timeStamp) {
+    constructor(holderID, issuerID, documentType, timeStamp,requestId) {
         this.holderID = holderID;
         this.issuerID = issuerID;
         this.documentType = documentType;
         this.timeStamp = timeStamp;
-        this.requestID = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+        this.requestID = requestId;
         this.type = 'issueRequest';
         if (this.__isContract) {
             delete this.__isContract;

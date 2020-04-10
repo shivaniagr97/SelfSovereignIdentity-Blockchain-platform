@@ -214,6 +214,7 @@ class SsiSmartContractContract extends Contract {
      * @param args
      * @returns {Promise<string>}
      */
+
     /*
     TODO : Add method to request verify authority for documents
      */
@@ -384,7 +385,7 @@ class SsiSmartContractContract extends Contract {
      * @param documentType
      * @returns {Promise<string>}
      */
-    async issueRequest(ctx, userID, issuerID, documentType, timeStamp) {
+    async issueRequest(ctx, userID, issuerID, documentType, timeStamp, requestId) {
         let holderExists = await this.assetExists(ctx, userID);
         let issuerExists = await this.assetExists(ctx, issuerID);
 
@@ -396,7 +397,7 @@ class SsiSmartContractContract extends Contract {
 
             if (issuer.issuerType === documentType) {
                 //create issue request
-                let issueRequest = await new IssueRequest(userID, issuerID, documentType, timeStamp);
+                let issueRequest = await new IssueRequest(userID, issuerID, documentType, timeStamp, requestId);
                 issueRequest.status = 'processing';
                 await ctx.stub.putState(issueRequest.requestID, Buffer.from(JSON.stringify(issueRequest)));
 
@@ -429,7 +430,7 @@ class SsiSmartContractContract extends Contract {
      * @param timeStamp
      * @returns {Promise<string>}
      */
-    async verifyRequest(ctx, holderID, documentID, verifierID, timeStamp) {
+    async verifyRequest(ctx, holderID, documentID, verifierID, timeStamp, requestId) {
         let holderExists = await this.assetExists(ctx, holderID);
         let verifierExists = await this.assetExists(ctx, verifierID);
         let documentExists = await this.assetExists(ctx, documentID);
@@ -443,7 +444,7 @@ class SsiSmartContractContract extends Contract {
             let document = JSON.parse(documentAsBytes);
             if (verifier.docTypes.contains(document.documentType)) {
                 //create new verify request
-                let verifyRequest = await new VerifyRequest(holderID, verifierID, documentID, timeStamp);
+                let verifyRequest = await new VerifyRequest(holderID, verifierID, documentID, timeStamp, requestId);
                 verifyRequest.status = 'processing';
                 await ctx.stub.putState(verifyRequest.requestID, Buffer.from(JSON.stringify(verifyRequest)));
 
@@ -636,6 +637,17 @@ class SsiSmartContractContract extends Contract {
             let response = `asset with id ${args.assetId} has been deleted`;
         } else {
             throw new Error(`No such asset with id ${args.assetId}`);
+        }
+    }
+
+    async readAsset(ctx, assetId) {
+        let assetExists = await this.assetExists(ctx, assetId);
+        if (assetExists) {
+            let assetAsBytes = await ctx.stub.getState(assetId);
+            let asset = JSON.parse(assetAsBytes);
+            return asset;
+        } else {
+            throw new Error(`asset with id ${assetId} doesmt exists`);
         }
     }
 }

@@ -10,12 +10,12 @@ class VerifyRequest {
      * @param timeStamp
      * @returns {IssueRequest}
      */
-    constructor(holderID, verifierID, documentID, timeStamp) {
+    constructor(holderID, verifierID, documentID, timeStamp, requestId) {
         this.holderID = holderID;
         this.verifierID = verifierID;
         this.documentID = documentID;
         this.timeStamp = timeStamp;
-        this.requestID = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+        this.requestID = requestId;
         this.type = 'verifyRequest';
         if (this.__isContract) {
             delete this.__isContract;

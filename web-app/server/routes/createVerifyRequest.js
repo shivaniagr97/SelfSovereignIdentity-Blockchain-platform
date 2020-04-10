@@ -42,7 +42,7 @@ router.post('/', async (req, res) => {
             // Disconnect from the gateway.
             await gateway.disconnect();
 
-            return response;
+            res.send("Correct");
 
         } catch (error) {
             console.log(` ... Failed to submit Transaction to the ledger ${error} ... `);

@@ -1,6 +1,3 @@
-/*
- * SPDX-License-Identifier: Apache-2.0
- */
 
 'use strict';
 
@@ -9,8 +6,6 @@ const { FileSystemWallet, X509WalletMixin } = require('fabric-network');
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
-var express = require('express');
-var router = express.Router();
 
 const ccpPath = path.resolve(__dirname, '..', '..', '..', 'blockchain-network', 'first-network', 'connection-org1.json');
 const ccpJSON = fs.readFileSync(ccpPath, 'utf8');
@@ -19,6 +14,7 @@ const ccp = JSON.parse(ccpJSON);
 async function main() {
     try {
 
+        console.log(ccpPath);
         // Create a new CA client for interacting with the CA.
         const caInfo = ccp.certificateAuthorities['ca.org1.example.com'];
         const caTLSCACerts = caInfo.tlsCACerts.pem;
@@ -29,6 +25,7 @@ async function main() {
         const wallet = new FileSystemWallet(walletPath);
         console.log(`Wallet path: ${walletPath}`);
 
+        console.log(await wallet.list());
         // Check to see if we've already enrolled the admin user.
         const adminExists = await wallet.exists('admin');
         if (adminExists) {
@@ -49,4 +46,3 @@ async function main() {
 }
 
 main();
-module.exports = router;

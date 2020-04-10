@@ -35,15 +35,14 @@ router.post('/', async (req, res) => {
 
             // Submit the specified transaction.
             let response = await contract.submitTransaction('issueRequest', req.body.userID, req.body.issuerID,
-                req.body.documentType, Date.now().toString());
+                req.body.documentType, Date.now().toString(), req.body.issueRequestId);
             response = JSON.stringify(response.toString());
             console.log(response);
 
             // Disconnect from the gateway.
             await gateway.disconnect();
 
-            return response;
-
+            res.send("Correct");
         } catch (error) {
             console.log(` ... Failed to submit Transaction to the ledger ${error} ... `);
             process.exit(1);
