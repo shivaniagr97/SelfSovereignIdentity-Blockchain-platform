@@ -640,6 +640,12 @@ class SsiSmartContractContract extends Contract {
         }
     }
 
+    /**
+     *
+     * @param ctx
+     * @param assetId
+     * @returns {Promise<any>}
+     */
     async readAsset(ctx, assetId) {
         let assetExists = await this.assetExists(ctx, assetId);
         if (assetExists) {
@@ -647,7 +653,23 @@ class SsiSmartContractContract extends Contract {
             let asset = JSON.parse(assetAsBytes);
             return asset;
         } else {
-            throw new Error(`asset with id ${assetId} doesmt exists`);
+            throw new Error(`asset with id ${assetId} doesn't exists`);
+        }
+    }
+
+    /**
+     *
+     * @param ctx
+     * @param userID
+     * @param password
+     * @returns {Promise<boolean>}
+     */
+    async verifyPassword(ctx, userID, password) {
+        let user = await this.readAsset(ctx, userID);
+        if (user.password === password) {
+            return true;
+        } else {
+            throw new Error(`user authentication failed`);
         }
     }
 }
