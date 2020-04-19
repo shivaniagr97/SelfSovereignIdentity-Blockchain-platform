@@ -51,7 +51,7 @@ router.post('/', async (req, res) => {
         }
 
     } catch (error) {
-        console.error(`Failed to verify password for the user ${req.body.id}: ${error}`);
+        // console.error(`Failed to verify password for the user ${req.body.userID}: ${error}`);
         res.send("Failed to verify password");
         process.exit(1);
     }

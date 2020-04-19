@@ -7,14 +7,16 @@ class Verifier {
      * @param password
      * @param contact
      * @param email
+     * @param docTypes
      * @returns {Verifier}
      */
-    constructor(verifierID, password, contact, email) {
+    constructor(verifierID, password, contact, email, docTypes) {
         if (this.validateVerifier(verifierID)) {
             this.verifierID = verifierID;
             this.password = password;
             this.contact = contact;
             this.email = email;
+            this.docTypes = docTypes;
             this.type = 'verifier';
             if (this.__isContract) {
                 delete this.__isContract;

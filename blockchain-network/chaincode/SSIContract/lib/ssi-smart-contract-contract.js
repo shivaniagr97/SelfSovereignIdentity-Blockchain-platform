@@ -67,6 +67,7 @@ class SsiSmartContractContract extends Contract {
         verifier1.password = 'pass1';
         verifier1.contact = '9089786751';
         verifier1.email = 'verfier1@gmail.com';
+        verifier1.docTypes = ['aadhaar'];
 
         response = await this.createVerifier(ctx, JSON.stringify(verifier1));
         console.log(response);
@@ -214,19 +215,13 @@ class SsiSmartContractContract extends Contract {
      * @param args
      * @returns {Promise<string>}
      */
-
-    /*
-    TODO : Add method to request verify authority for documents
-     */
     async createVerifier(ctx, args) {
         args = JSON.parse(args);
 
-        let docTypes = [];
         let verifyRequests = [];
 
-        let verifier = await new Verifier(args.verifierID, args.password, args.contact, args.email);
+        let verifier = await new Verifier(args.verifierID, args.password, args.contact, args.email, args.docTypes);
 
-        verifier.docTypes = docTypes;
         verifier.verifyRequests = verifyRequests;
 
         await ctx.stub.putState(verifier.verifierID, Buffer.from(JSON.stringify(verifier)));
@@ -668,7 +663,7 @@ class SsiSmartContractContract extends Contract {
         if (assetExists) {
             let assetAsBytes = await ctx.stub.getState(args.userID);
             let asset = JSON.parse(assetAsBytes);
-            return asset.password === args.password;
+            return asset.password == args.password;
         } else {
             throw new Error(`user with id ${args.userID} doesn't exists`);
         }
