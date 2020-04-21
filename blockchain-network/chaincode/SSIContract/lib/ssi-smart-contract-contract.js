@@ -659,11 +659,12 @@ class SsiSmartContractContract extends Contract {
      * @returns {Promise<boolean>}
      */
     async verifyPassword(ctx, args) {
+        args = JSON.parse(args);
         let assetExists = await this.assetExists(ctx, args.userID);
         if (assetExists) {
             let assetAsBytes = await ctx.stub.getState(args.userID);
             let asset = JSON.parse(assetAsBytes);
-            return asset.password == args.password;
+            return asset.password === args.password;
         } else {
             throw new Error(`user with id ${args.userID} doesn't exists`);
         }
