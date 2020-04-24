@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {HashRouter as Router, Route, Link, NavLink} from 'react-router-dom';
+import {HashRouter as Router, Route} from 'react-router-dom';
 import userLogin from "./userLogin";
 import registerUser from "./registerUser";
 import userPage from "./userPage";

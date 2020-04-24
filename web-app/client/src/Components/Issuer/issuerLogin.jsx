@@ -1,13 +1,13 @@
 import React, {Component} from 'react';
 import {Link, NavLink, Redirect} from 'react-router-dom';
-import './userLogin.css';
+import './issuerLogin.css';
 import axios from 'axios';
 import {ADDRESS} from "../constants";
 import Spinner from "react-bootstrap/Spinner";
 import AppAside from "./AppAside";
 import FormSwitcher from "./FormSwitcher";
 
-class userLogin extends Component {
+class issuerLogin extends Component {
     constructor(props) {
         super(props);
 
@@ -113,4 +113,4 @@ class userLogin extends Component {
     }
 }
 
-export default userLogin;
+export default issuerLogin;

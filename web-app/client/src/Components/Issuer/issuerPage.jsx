@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 
-class userPage extends Component {
+class issuerPage extends Component {
     render() {
         return (
             <div>This is where user dashboard appears</div>
@@ -8,4 +8,4 @@ class userPage extends Component {
     }
 }
 
-export default userPage;
+export default issuerPage;

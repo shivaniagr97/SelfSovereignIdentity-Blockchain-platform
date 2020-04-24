@@ -1,22 +1,19 @@
 import React, {Component} from 'react';
 import {Link, Redirect} from 'react-router-dom';
 import axios from 'axios';
-import './registerUser.css'
+import './registerIssuer.css'
 import {ADDRESS} from "../constants";
 import FormSwitcher from "./FormSwitcher";
 import AppAside from "./AppAside";
 
-class registerUser extends Component {
+class registerIssuer extends Component {
     constructor(props) {
         super(props);
 
         this.state = {
-            firstName: '',
-            lastName: '',
             userID: '',
             password: '',
-            dateOfBirth: '',
-            address: '',
+            issuerType: '',
             city: '',
             state: '',
             pinCode: '',
@@ -48,19 +45,16 @@ class registerUser extends Component {
             spinner: true
         });
         const userDetails = {
-            firstName: this.state.firstName,
-            lastName: this.state.lastName,
-            userID: this.state.userID,
+            issuerID: this.state.userID,
             password: this.state.password,
-            dateOfBirth: this.state.dateOfBirth,
-            address: this.state.address,
+            issuerType: this.state.issuerType,
             city: this.state.city,
             state: this.state.state,
             pinCode: this.state.pinCode,
             contact: this.state.contact,
             email: this.state.email
         };
-        let response = await axios.post(ADDRESS + `registerHolder`, userDetails);
+        let response = await axios.post(ADDRESS + `createIssuer`, userDetails);
         if (typeof response.data === "object") {
             localStorage.setItem("token", this.state.userID);
             this.setState({
@@ -91,18 +85,6 @@ class registerUser extends Component {
                         <div className="FormCenter">
                             <form onSubmit={this.handleSubmit} className="FormFields">
                                 <div className="FormField">
-                                    <label className="FormField__Label" htmlFor="name">First Name</label>
-                                    <input type="text" id="firstName" className="FormField__Input"
-                                           placeholder="Enter your first name"
-                                           name="firstName" value={this.state.firstName} onChange={this.handleChange}/>
-                                </div>
-                                <div className="FormField">
-                                    <label className="FormField__Label" htmlFor="lastName">Last Name</label>
-                                    <input type="text" id="lastName" className="FormField__Input"
-                                           placeholder="Enter your last name"
-                                           name="lastName" value={this.state.lastName} onChange={this.handleChange}/>
-                                </div>
-                                <div className="FormField">
                                     <label className="FormField__Label" htmlFor="userID">User ID</label>
                                     <input type="text" id="userID" className="FormField__Input"
                                            placeholder="Enter your user ID"
@@ -115,17 +97,11 @@ class registerUser extends Component {
                                            onChange={this.handleChange}/>
                                 </div>
                                 <div className="FormField">
-                                    <label className="FormField__Label" htmlFor="dateOfBirth">Date Of Birth</label>
-                                    <input type="date" id="dateOfBirth" className="FormField__Input"
-                                           placeholder="Enter your date of birth"
-                                           name="dateOfBirth" value={this.state.dateOfBirth}
+                                    <label className="FormField__Label" htmlFor="issuerType">Issuer Type</label>
+                                    <input type="issuerType" id="issuerType" className="FormField__Input"
+                                           placeholder="Enter your issuer type"
+                                           name="issuerType" value={this.state.issuerType}
                                            onChange={this.handleChange}/>
-                                </div>
-                                <div className="FormField">
-                                    <label className="FormField__Label" htmlFor="address">Address</label>
-                                    <input type="address" id="address" className="FormField__Input"
-                                           placeholder="Enter your address"
-                                           name="address" value={this.state.address} onChange={this.handleChange}/>
                                 </div>
                                 <div className="FormField">
                                     <label className="FormField__Label" htmlFor="city">City</label>
@@ -181,4 +157,4 @@ class registerUser extends Component {
     }
 }
 
-export default registerUser;
+export default registerIssuer;

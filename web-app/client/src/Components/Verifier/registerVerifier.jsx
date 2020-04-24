@@ -1,27 +1,21 @@
 import React, {Component} from 'react';
 import {Link, Redirect} from 'react-router-dom';
 import axios from 'axios';
-import './registerUser.css'
+import './registerVerifier.css'
 import {ADDRESS} from "../constants";
 import FormSwitcher from "./FormSwitcher";
 import AppAside from "./AppAside";
 
-class registerUser extends Component {
+class registerVerifier extends Component {
     constructor(props) {
         super(props);
 
         this.state = {
-            firstName: '',
-            lastName: '',
             userID: '',
             password: '',
-            dateOfBirth: '',
-            address: '',
-            city: '',
-            state: '',
-            pinCode: '',
             contact: '',
             email: '',
+            docTypes: [],
             hasAgreed: false,
             SMSUpdates: false,
             isRegistered: false
@@ -48,19 +42,13 @@ class registerUser extends Component {
             spinner: true
         });
         const userDetails = {
-            firstName: this.state.firstName,
-            lastName: this.state.lastName,
-            userID: this.state.userID,
+            verifierID: this.state.userID,
             password: this.state.password,
-            dateOfBirth: this.state.dateOfBirth,
-            address: this.state.address,
-            city: this.state.city,
-            state: this.state.state,
-            pinCode: this.state.pinCode,
             contact: this.state.contact,
-            email: this.state.email
+            email: this.state.email,
+            docTypes: this.state.docTypes
         };
-        let response = await axios.post(ADDRESS + `registerHolder`, userDetails);
+        let response = await axios.post(ADDRESS + `createVerifier`, userDetails);
         if (typeof response.data === "object") {
             localStorage.setItem("token", this.state.userID);
             this.setState({
@@ -91,18 +79,6 @@ class registerUser extends Component {
                         <div className="FormCenter">
                             <form onSubmit={this.handleSubmit} className="FormFields">
                                 <div className="FormField">
-                                    <label className="FormField__Label" htmlFor="name">First Name</label>
-                                    <input type="text" id="firstName" className="FormField__Input"
-                                           placeholder="Enter your first name"
-                                           name="firstName" value={this.state.firstName} onChange={this.handleChange}/>
-                                </div>
-                                <div className="FormField">
-                                    <label className="FormField__Label" htmlFor="lastName">Last Name</label>
-                                    <input type="text" id="lastName" className="FormField__Input"
-                                           placeholder="Enter your last name"
-                                           name="lastName" value={this.state.lastName} onChange={this.handleChange}/>
-                                </div>
-                                <div className="FormField">
                                     <label className="FormField__Label" htmlFor="userID">User ID</label>
                                     <input type="text" id="userID" className="FormField__Input"
                                            placeholder="Enter your user ID"
@@ -115,37 +91,6 @@ class registerUser extends Component {
                                            onChange={this.handleChange}/>
                                 </div>
                                 <div className="FormField">
-                                    <label className="FormField__Label" htmlFor="dateOfBirth">Date Of Birth</label>
-                                    <input type="date" id="dateOfBirth" className="FormField__Input"
-                                           placeholder="Enter your date of birth"
-                                           name="dateOfBirth" value={this.state.dateOfBirth}
-                                           onChange={this.handleChange}/>
-                                </div>
-                                <div className="FormField">
-                                    <label className="FormField__Label" htmlFor="address">Address</label>
-                                    <input type="address" id="address" className="FormField__Input"
-                                           placeholder="Enter your address"
-                                           name="address" value={this.state.address} onChange={this.handleChange}/>
-                                </div>
-                                <div className="FormField">
-                                    <label className="FormField__Label" htmlFor="city">City</label>
-                                    <input type="city" id="city" className="FormField__Input"
-                                           placeholder="Enter your city"
-                                           name="city" value={this.state.city} onChange={this.handleChange}/>
-                                </div>
-                                <div className="FormField">
-                                    <label className="FormField__Label" htmlFor="state">State</label>
-                                    <input type="state" id="state" className="FormField__Input"
-                                           placeholder="Enter your state"
-                                           name="state" value={this.state.state} onChange={this.handleChange}/>
-                                </div>
-                                <div className="FormField">
-                                    <label className="FormField__Label" htmlFor="pinCode">Pin Code</label>
-                                    <input type="pinCode" id="pinCode" className="FormField__Input"
-                                           placeholder="Enter your pinCode"
-                                           name="pinCode" value={this.state.pinCode} onChange={this.handleChange}/>
-                                </div>
-                                <div className="FormField">
                                     <label className="FormField__Label" htmlFor="contact">Contact Number</label>
                                     <input type="contact" id="contact" className="FormField__Input"
                                            placeholder="Enter your contact number"
@@ -156,6 +101,12 @@ class registerUser extends Component {
                                     <input type="email" id="email" className="FormField__Input"
                                            placeholder="Enter your email"
                                            name="email" value={this.state.email} onChange={this.handleChange}/>
+                                </div>
+                                <div className="FormField">
+                                    <label className="FormField__Label" htmlFor="docTypes">Document Type</label>
+                                    <input type="docTypes" id="docTypes" className="FormField__Input"
+                                           placeholder="Enter your document type"
+                                           name="docTypes" value={this.state.docTypes} onChange={this.handleChange}/>
                                 </div>
                                 <div className="FormField">
                                     <label className="FormField__CheckboxLabel">
@@ -181,4 +132,4 @@ class registerUser extends Component {
     }
 }
 
-export default registerUser;
+export default registerVerifier;
