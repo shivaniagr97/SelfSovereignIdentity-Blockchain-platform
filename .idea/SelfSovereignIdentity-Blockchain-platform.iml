@@ -6,5 +6,6 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="client" />
     <orderEntry type="module" module-name="server" />
+    <orderEntry type="module" module-name="material-dashboard-react" />
   </component>
 </module>

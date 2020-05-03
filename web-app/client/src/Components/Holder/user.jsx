@@ -2,9 +2,10 @@ import React, {Component} from 'react';
 import {HashRouter as Router, Route} from 'react-router-dom';
 import userLogin from "./userLogin";
 import registerUser from "./registerUser";
-import userPage from "./userPage";
+import Admin from "./UserDashboard/Admin";
 
 class user extends Component {
+
     render() {
         return (
             <Router basename="">
@@ -12,7 +13,7 @@ class user extends Component {
                 </Route>
                 <Route exact path="/" component={userLogin}>
                 </Route>
-                <Route exact path="/home" component={userPage}>
+                <Route path="/home" component={Admin}>
                 </Route>
             </Router>
         );

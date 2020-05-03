@@ -3,7 +3,6 @@ import {Link, NavLink, Redirect} from 'react-router-dom';
 import './verifierLogin.css';
 import axios from 'axios';
 import {ADDRESS} from "../constants";
-import Spinner from "react-bootstrap/Spinner";
 import AppAside from "./AppAside";
 import FormSwitcher from "./FormSwitcher";
 
@@ -74,9 +73,7 @@ class verifierLogin extends Component {
                 pathname: 'home',
             }}/>;
         }
-        if (this.state.spinner) {
-            return <Spinner animation="border"/>;
-        } else {
+        else {
 
             return (
                 <div className="App">
