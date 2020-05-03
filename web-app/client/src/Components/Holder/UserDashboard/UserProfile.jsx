@@ -14,6 +14,9 @@ import CardBody from "../../../UIComponents/Card/CardBody.jsx";
 import CardFooter from "../../../UIComponents/Card/CardFooter.jsx";
 
 import avatar from "../../../assets/img/faces/marc.jpg";
+//backend call
+import axios from "axios";
+import {ADDRESS} from "../../constants.js";
 
 const styles = {
     cardCategoryWhite: {

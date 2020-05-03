@@ -18,6 +18,7 @@ class userLogin extends Component {
         this.state = {
             userID: '',
             password: '',
+            sessionKey: '',
             alertType: "danger",
             alertData: "",
             alertShow: false,
@@ -51,11 +52,17 @@ class userLogin extends Component {
         };
 
         let response = await axios.post(ADDRESS + `verifyPassword`, userCredentials);
+        response = response.data;
 
-        if (typeof response.data === "object") {
-            localStorage.setItem("token", this.state.userID);
+        if (response.data !== "Incorrect" && response.data !== "Failed to verify password") {
+            let token = {
+                userID: this.state.userID,
+                sessionKey: response.data
+            }
+            localStorage.setItem("token", JSON.stringify(token));
             this.setState({
                 loggedIn: true,
+                sessionKey: response.data
             });
         } else {
             this.setState({

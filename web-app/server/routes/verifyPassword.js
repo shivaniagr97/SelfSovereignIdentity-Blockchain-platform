@@ -40,12 +40,12 @@ router.post('/', async (req, res) => {
             let sessionKey = await handler.generateSessionKey(req.body.userID);
             console.log(sessionKey);
             let response = {
-                "Correct": sessionKey
+                "data": sessionKey
             };
             res.send(JSON.stringify(response));
         } else {
             let response = {
-                "inCorrect": false
+                "data": false
             };
             res.send(JSON.stringify(response));
         }
