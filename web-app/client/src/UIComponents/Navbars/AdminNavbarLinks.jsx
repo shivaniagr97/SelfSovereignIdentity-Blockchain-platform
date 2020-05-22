@@ -57,7 +57,6 @@ export default function AdminNavbarLinks() {
             }
         } catch (e) {
             //handle the error by giving out a error messeage saying the logOUt failed
-            console.log(localStorage);
         }
     };
 
