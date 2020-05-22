@@ -638,6 +638,42 @@ class SsiSmartContractContract extends Contract {
     /**
      *
      * @param ctx
+     * @param args
+     * @returns {Promise<any>}
+     */
+    async getModifiedAsset(ctx, args) {
+
+        args = JSON.parse(args);
+        let assetExists = await this.assetExists(ctx, args.id);
+        if (assetExists) {
+            let assetAsBytes = await ctx.stub.getState(args.id);
+            let asset = JSON.parse(assetAsBytes);
+            delete asset.password;
+            return asset;
+        } else {
+            throw new Error(`the asset with id ${args.id} doesn't exist`);
+        }
+    }
+
+    /**
+     *
+     * @param ctx
+     * @param args
+     * @returns {Promise<void>}
+     */
+    async updateAsset(ctx, args) {
+        args = await JSON.parse(args);
+        const exists = await this.assetExists(ctx, args.id);
+        if (!exists) {
+            throw new Error(`The ehr ${args.id} does not exist`);
+        }
+        await ctx.stub.putState(args.id, Buffer.from(JSON.stringify(args)));
+    }
+
+
+    /**
+     *
+     * @param ctx
      * @param assetId
      * @returns {Promise<any>}
      */

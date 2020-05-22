@@ -13,11 +13,13 @@ var createVerifier = require('./routes/createVerifier');
 var createVerifyRequest = require('./routes/createVerifyRequest');
 var grantAccess = require('./routes/grantAccess');
 var issueIdentity = require('./routes/issueIdentity');
+var logOut = require('./routes/logOut');
+var readAssets = require('./routes/readAssets');
 var requestAccess = require('./routes/requestAccess');
 var revokeAccess = require('./routes/revokeAccess');
 var verifyIdentity = require('./routes/verifyIdentity');
 var verifyPassword = require('./routes/verifyPassword');
-var logOut = require('./routes/logOut');
+var updateAsset = require('./routes/updateAsset');
 
 var app = express();
 const cors = require('cors');
@@ -41,11 +43,13 @@ app.use('/createVerifier', createVerifier);
 app.use('/createVerifyRequest', createVerifyRequest);
 app.use('/grantAccess', grantAccess);
 app.use('/issueIdentity', issueIdentity);
+app.use('/logOut', logOut);
+app.use('/readAsset', readAssets);
 app.use('/requestAccess', requestAccess);
 app.use('/revokeAccess', revokeAccess);
 app.use('/verifyIdentity', verifyIdentity);
 app.use('/verifyPassword', verifyPassword);
-app.use('/logOut', logOut);
+app.use('/updateAsset', updateAsset);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

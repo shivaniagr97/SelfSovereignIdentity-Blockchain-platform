@@ -1,54 +1,33 @@
 import React from "react";
-import { Switch, Route, Redirect } from "react-router-dom";
-// creates a beautiful scrollbar
+import {Switch, Route, Redirect} from "react-router-dom";
+import axios from 'axios';
 import PerfectScrollbar from "perfect-scrollbar";
 import "perfect-scrollbar/css/perfect-scrollbar.css";
-// @material-ui/core components
-import { makeStyles } from "@material-ui/core/styles";
-// core components
+import {makeStyles} from "@material-ui/core/styles";
 import Navbar from "../../../UIComponents/Navbars/Navbar.jsx";
-import Footer from "../../../UIComponents/Footer/Footer.jsx";
 import Sidebar from "../../../UIComponents/Sidebar/Sidebar.jsx";
-
 import routes from "./userRoutes.jsx";
-
 import styles from "../../../assets/jss/material-dashboard-react/layouts/adminStyle.js";
-
 import bgImage from "../../../assets/img/sidebar-2.jpg";
-import logo from "../../../assets/img/reactlogo.png";
+import logo from "../../../assets/img/holder.png";
+import {ADDRESS} from "../../constants";
 
 let ps;
 
-const switchRoutes = (
-    <Switch>
-        {routes.map((prop, key) => {
-            if (prop.layout === "/home") {
-                return (
-                    <Route
-                        path={prop.layout + prop.path}
-                        component={prop.component}
-                        key={key}
-                    />
-                );
-            }
-            return null;
-        })}
-        {/*<Redirect from="/home" to="/home/dashboard" />*/}
-    </Switch>
-);
-
 const useStyles = makeStyles(styles);
 
-export default function Admin({ ...rest }) {
-    // styles
+export default function Admin({...rest}) {
     const classes = useStyles();
-    // ref to help us initialize PerfectScrollbar on windows devices
     const mainPanel = React.createRef();
+    console.log(localStorage.getItem('userToken'));
+
     // states and functions
     const [image, setImage] = React.useState(bgImage);
+    const [userData, setUserData] = React.useState({});
+    const [logOut, setLogOut] = React.useState(false);
     const [color, setColor] = React.useState("blue");
-    const [fixedClasses, setFixedClasses] = React.useState("dropdown show");
     const [mobileOpen, setMobileOpen] = React.useState(false);
+
     const handleDrawerToggle = () => {
         setMobileOpen(!mobileOpen);
     };
@@ -60,8 +39,36 @@ export default function Admin({ ...rest }) {
             setMobileOpen(false);
         }
     };
+
     // initialize and destroy the PerfectScrollbar plugin
     React.useEffect(() => {
+        //first fetch the data from the backend about the user
+        const fetchUserData = async () => {
+            console.log("hete");
+            try {
+                let userCredentials = JSON.parse(localStorage.getItem('userToken'));
+                if (!userCredentials) {
+                    setLogOut(true);
+                } else {
+                    userCredentials.type = "user";
+                    console.log(userCredentials);
+                    let response = await axios.post(ADDRESS + `readAsset`, userCredentials);
+                    if (response !== null) {
+                        response = response.data;
+                        response = JSON.parse(response);
+                        response.sessionKey = userCredentials.sessionKey;
+                        console.log(response);
+                        setUserData(response || {});
+                    }
+                }
+            } catch (e) {
+                console.log(e);
+            }
+        };
+        localStorage.setItem("token", localStorage.getItem("userToken"));
+        console.log(Object.keys(userData).length === 0);
+        if (!Object.keys(userData).length)
+            fetchUserData();
         if (navigator.platform.indexOf("Win") > -1) {
             ps = new PerfectScrollbar(mainPanel.current, {
                 suppressScrollX: true,
@@ -78,11 +85,36 @@ export default function Admin({ ...rest }) {
             window.removeEventListener("resize", resizeFunction);
         };
     }, [mainPanel]);
+
+    if (logOut) {
+        return <Redirect to={{
+            pathname: '/',
+        }}/>;
+    }
+
+    const switchRoutes = (
+        <Switch>
+            {routes.map((prop, key) => {
+                if (prop.layout === "/home") {
+                    return (
+                        <Route
+                            path={prop.layout + prop.path}
+                            render={(props) => <prop.component {...props} userData={userData}/>}
+                            key={key}
+                        />
+                    );
+                }
+                return null;
+            })}
+            {/*<Redirect from="/home" to="/home/dashboard" />*/}
+        </Switch>
+    );
+
     return (
         <div className={classes.wrapper}>
             <Sidebar
                 routes={routes}
-                logoText={"Creative Tim"}
+                logoText={"Holder"}
                 logo={logo}
                 image={image}
                 handleDrawerToggle={handleDrawerToggle}
@@ -96,7 +128,6 @@ export default function Admin({ ...rest }) {
                     handleDrawerToggle={handleDrawerToggle}
                     {...rest}
                 />
-                {/* On the /maps route we want the map to be on full screen - this is not possible if the content and conatiner classes are present because they have some paddings which would make the map smaller */}
                 {getRoute() ? (
                     <div className={classes.content}>
                         <div className={classes.container}>{switchRoutes}</div>
@@ -104,7 +135,6 @@ export default function Admin({ ...rest }) {
                 ) : (
                     <div className={classes.map}>{switchRoutes}</div>
                 )}
-                {getRoute() ? <Footer /> : null}
             </div>
         </div>
     );

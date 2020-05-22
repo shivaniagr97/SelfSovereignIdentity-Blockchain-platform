@@ -1,20 +1,13 @@
 import React from "react";
-// @material-ui/core components
-import { makeStyles } from "@material-ui/core/styles";
-import InputLabel from "@material-ui/core/InputLabel";
-// core components
+import {makeStyles} from "@material-ui/core/styles";
 import GridItem from "../../../UIComponents/Grid/GridItem.jsx";
 import GridContainer from "../../../UIComponents/Grid/GridContainer.jsx";
 import CustomInput from "../../../UIComponents/CustomInput/CustomInput.jsx";
 import Button from "../../../UIComponents/CustomButtons/Button.jsx";
 import Card from "../../../UIComponents/Card/Card.jsx";
 import CardHeader from "../../../UIComponents/Card/CardHeader.jsx";
-import CardAvatar from "../../../UIComponents/Card/CardAvatar.jsx";
 import CardBody from "../../../UIComponents/Card/CardBody.jsx";
 import CardFooter from "../../../UIComponents/Card/CardFooter.jsx";
-
-import avatar from "../../../assets/img/faces/marc.jpg";
-//backend call
 import axios from "axios";
 import {ADDRESS} from "../../constants.js";
 
@@ -39,8 +32,43 @@ const styles = {
 
 const useStyles = makeStyles(styles);
 
-export default function UserProfile() {
+export default function UserProfile(props) {
     const classes = useStyles();
+    localStorage.setItem("token", localStorage.getItem("userToken"));
+    const [userData, setUserData] = React.useState(props.userData);
+    console.log(userData);
+
+    const handleChange = (event) => {
+        event.preventDefault();
+        console.log(event.target.name);
+        console.log(event.target.value);
+        userData[event.target.name] = event.target.value;
+        setUserData(userData);
+        console.log("here");
+    };
+
+    const submitDetails = async (event) => {
+        event.preventDefault();
+        let response = "";
+        try {
+            console.log(userData);
+            response = await axios.post(ADDRESS + `updateAsset`, userData);
+            response = response.data;
+            console.log(response);
+            if (response === "Correct") {
+                console.log(response);
+                delete userData.password;
+                setUserData(userData);
+            } else {
+                //show error message
+                console.log(response);
+            }
+        } catch (e) {
+            //show error message
+            console.log("failed to connect to the server");
+        }
+    };
+
     return (
         <div>
             <GridContainer>
@@ -54,32 +82,43 @@ export default function UserProfile() {
                             <GridContainer>
                                 <GridItem xs={12} sm={12} md={5}>
                                     <CustomInput
-                                        labelText="Company (disabled)"
-                                        id="company-disabled"
+                                        labelText="Contact"
+                                        id="Contact"
                                         formControlProps={{
                                             fullWidth: true
                                         }}
-                                        inputProps={{
-                                            disabled: true
-                                        }}
+                                        name={"contact"}
+                                        autoComplete={"Contact"}
+                                        readOnly={false}
+                                        value={userData.contact || ''}
+                                        handleChange={handleChange}
                                     />
                                 </GridItem>
                                 <GridItem xs={12} sm={12} md={3}>
                                     <CustomInput
-                                        labelText="Username"
-                                        id="username"
+                                        labelText="UserName"
+                                        id="userID"
                                         formControlProps={{
                                             fullWidth: true
                                         }}
+                                        name={"userID"}
+                                        autoComplete={"userID"}
+                                        readOnly={true}
+                                        value={userData.userID || ''}
                                     />
                                 </GridItem>
                                 <GridItem xs={12} sm={12} md={4}>
                                     <CustomInput
-                                        labelText="Email address"
-                                        id="email-address"
+                                        labelText="Email Address"
+                                        id="email"
                                         formControlProps={{
                                             fullWidth: true
                                         }}
+                                        name={"email"}
+                                        autoComplete={"email"}
+                                        readOnly={false}
+                                        value={userData.email || ''}
+                                        handleChange={handleChange}
                                     />
                                 </GridItem>
                             </GridContainer>
@@ -91,6 +130,11 @@ export default function UserProfile() {
                                         formControlProps={{
                                             fullWidth: true
                                         }}
+                                        name={"firstName"}
+                                        autoComplete={"firstName"}
+                                        readOnly={false}
+                                        value={userData.firstName || ''}
+                                        handleChange={handleChange}
                                     />
                                 </GridItem>
                                 <GridItem xs={12} sm={12} md={6}>
@@ -100,6 +144,11 @@ export default function UserProfile() {
                                         formControlProps={{
                                             fullWidth: true
                                         }}
+                                        name={"lastName"}
+                                        autoComplete={"lastName"}
+                                        readOnly={false}
+                                        value={userData.lastName || ''}
+                                        handleChange={handleChange}
                                     />
                                 </GridItem>
                             </GridContainer>
@@ -111,15 +160,11 @@ export default function UserProfile() {
                                         formControlProps={{
                                             fullWidth: true
                                         }}
-                                    />
-                                </GridItem>
-                                <GridItem xs={12} sm={12} md={4}>
-                                    <CustomInput
-                                        labelText="Country"
-                                        id="country"
-                                        formControlProps={{
-                                            fullWidth: true
-                                        }}
+                                        name={"city"}
+                                        autoComplete={"city"}
+                                        readOnly={false}
+                                        value={userData.city || ''}
+                                        handleChange={handleChange}
                                     />
                                 </GridItem>
                                 <GridItem xs={12} sm={12} md={4}>
@@ -129,50 +174,33 @@ export default function UserProfile() {
                                         formControlProps={{
                                             fullWidth: true
                                         }}
+                                        name={"pinCode"}
+                                        autoComplete={"pinCode"}
+                                        readOnly={false}
+                                        value={userData.pinCode || ''}
+                                        handleChange={handleChange}
                                     />
                                 </GridItem>
-                            </GridContainer>
-                            <GridContainer>
-                                <GridItem xs={12} sm={12} md={12}>
-                                    <InputLabel style={{ color: "#AAAAAA" }}>About me</InputLabel>
+                                <GridItem xs={12} sm={12} md={4}>
                                     <CustomInput
-                                        labelText="Lamborghini Mercy, Your chick she so thirsty, I'm in that two seat Lambo."
-                                        id="about-me"
+                                        labelText="Password"
+                                        id="password"
                                         formControlProps={{
                                             fullWidth: true
                                         }}
-                                        inputProps={{
-                                            multiline: true,
-                                            rows: 5
-                                        }}
+                                        name={"password"}
+                                        autoComplete={"password"}
+                                        readOnly={false}
+                                        value={userData.password || ''}
+                                        type={'password'}
+                                        handleChange={handleChange}
                                     />
                                 </GridItem>
                             </GridContainer>
                         </CardBody>
                         <CardFooter>
-                            <Button color="primary">Update Profile</Button>
+                            <Button color="primary" onClick={submitDetails}>Update Profile</Button>
                         </CardFooter>
-                    </Card>
-                </GridItem>
-                <GridItem xs={12} sm={12} md={4}>
-                    <Card profile>
-                        <CardAvatar profile>
-                            <a href="#pablo" onClick={e => e.preventDefault()}>
-                                <img src={avatar} alt="..." />
-                            </a>
-                        </CardAvatar>
-                        <CardBody profile>
-                            <h6 className={classes.cardCategory}>CEO / CO-FOUNDER</h6>
-                            <h4 className={classes.cardTitle}>Alec Thompson</h4>
-                            <p className={classes.description}>
-                                Don{"'"}t be scared of the truth because we need to restart the
-                                human foundation in truth And I love you like Kanye loves Kanye
-                                I love Rick Owens’ bed design but the back is...
-                            </p>
-                            <Button color="primary" round>
-                                Follow
-                            </Button>
-                        </CardBody>
                     </Card>
                 </GridItem>
             </GridContainer>

@@ -8,8 +8,8 @@ import AppAside from "./AppAside";
 
 class registerUser extends Component {
     constructor(props) {
+        localStorage.removeItem('userToken');
         super(props);
-
         this.state = {
             firstName: '',
             lastName: '',
@@ -168,7 +168,7 @@ class registerUser extends Component {
 
                                 <div className="FormField">
                                     <button className="FormField__Button mr-20">Sign Up</button>
-                                    <Link exact to="/" className="FormField__Link">I'm already member</Link>
+                                    <Link to="/" className="FormField__Link">I'm already member</Link>
                                 </div>
                             </form>
                         </div>

@@ -9,10 +9,10 @@ import FormSwitcher from "./FormSwitcher";
 class userLogin extends Component {
     constructor(props) {
         super(props);
-
-        const token = localStorage.getItem("token");
+        localStorage.clear();
+        const userToken = localStorage.getItem("userToken");
         let loggedIn = true;
-        if (token == null) {
+        if (userToken == null) {
             loggedIn = false;
         }
         this.state = {
@@ -55,11 +55,11 @@ class userLogin extends Component {
         response = response.data;
 
         if (response.data !== "Incorrect" && response.data !== "Failed to verify password") {
-            let token = {
+            let userToken = {
                 userID: this.state.userID,
                 sessionKey: response.data
-            }
-            localStorage.setItem("token", JSON.stringify(token));
+            };
+            localStorage.setItem("userToken", JSON.stringify(userToken));
             this.setState({
                 loggedIn: true,
                 sessionKey: response.data
@@ -79,8 +79,7 @@ class userLogin extends Component {
             return <Redirect to={{
                 pathname: 'home',
             }}/>;
-        }
-        else {
+        } else {
 
             return (
                 <div className="App">

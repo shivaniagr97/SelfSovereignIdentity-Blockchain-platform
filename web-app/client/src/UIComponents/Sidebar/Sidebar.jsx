@@ -16,6 +16,7 @@ import AdminNavbarLinks from "../Navbars/AdminNavbarLinks.jsx";
 import RTLNavbarLinks from "../Navbars/RTLNavbarLinks.jsx";
 
 import styles from "../../assets/jss/material-dashboard-react/components/sidebarStyle.js";
+import Link from "@material-ui/core/Link";
 
 const useStyles = makeStyles(styles);
 
@@ -83,7 +84,7 @@ export default function Sidebar(props) {
   var brand = (
     <div className={classes.logo}>
       <a
-        href="https://www.creative-tim.com?ref=mdr-sidebar"
+        href="https://github.com/shivaniagr97/SelfSovereignIdentity-Blockchain-platform"
         className={classNames(classes.logoLink, {
           [classes.logoLinkRTL]: props.rtlActive
         })}
