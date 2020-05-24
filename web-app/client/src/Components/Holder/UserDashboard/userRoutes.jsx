@@ -18,6 +18,7 @@
 // @material-ui/icons
 import Dashboard from "@material-ui/icons/Dashboard";
 import Person from "@material-ui/icons/Person";
+import ArrowUpward from "@material-ui/icons/ArrowUpward"
 import LibraryBooks from "@material-ui/icons/LibraryBooks";
 import BubbleChart from "@material-ui/icons/BubbleChart";
 import LocationOn from "@material-ui/icons/LocationOn";
@@ -27,6 +28,8 @@ import Language from "@material-ui/icons/Language";
 // core components/views for Admin layout
 import DashboardPage from "./DashboardPage.jsx";
 import UserProfile from "./UserProfile.jsx";
+import UploadDocument from "./UploadDocument";
+import ViewDocuments from "./ViewDocuments";
 // import TableList from "views/TableList/TableList.js";
 // import Typography from "views/Typography/Typography.js";
 // import Icons from "views/Icons/Icons.js";
@@ -52,23 +55,23 @@ const dashboardRoutes = [
         icon: Person,
         component: UserProfile,
         layout: "/home"
+    },
+    {
+        path: "/uploadDocument",
+        name: "Upload Document",
+        rtlName: "قائمة الجدول",
+        icon: ArrowUpward,
+        component: UploadDocument,
+        layout: "/home"
+    },
+    {
+        path: "/viewDocuments",
+        name: "View Documents",
+        rtlName: "طباعة",
+        icon: LibraryBooks,
+        component: ViewDocuments,
+        layout: "/home"
     }
-    // {
-    //     path: "/table",
-    //     name: "Table List",
-    //     rtlName: "قائمة الجدول",
-    //     icon: "content_paste",
-    //     component: TableList,
-    //     layout: "/admin"
-    // },
-    // {
-    //     path: "/typography",
-    //     name: "Typography",
-    //     rtlName: "طباعة",
-    //     icon: LibraryBooks,
-    //     component: Typography,
-    //     layout: "/admin"
-    // },
     // {
     //     path: "/icons",
     //     name: "Icons",
