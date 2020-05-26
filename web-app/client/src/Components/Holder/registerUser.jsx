@@ -62,9 +62,9 @@ class registerUser extends Component {
         };
         let response = await axios.post(ADDRESS + `registerHolder`, userDetails);
         if (typeof response.data === "object") {
-            localStorage.setItem("token", this.state.userID);
+            localStorage.setItem("userToken", this.state.userID);
             this.setState({
-                loggedIn: true,
+                isRegistered: true,
             });
         } else {
             this.setState({

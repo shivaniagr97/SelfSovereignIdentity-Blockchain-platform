@@ -10,9 +10,9 @@ class issuerLogin extends Component {
     constructor(props) {
         super(props);
 
-        const token = localStorage.getItem("token");
+        const issuerToken = localStorage.getItem("issuerToken");
         let loggedIn = true;
-        if (token == null) {
+        if (issuerToken == null) {
             loggedIn = false;
         }
         this.state = {
@@ -53,7 +53,7 @@ class issuerLogin extends Component {
         let response = await axios.post(ADDRESS + `verifyPassword`, userCredentials);
 
         if (typeof response.data === "object") {
-            localStorage.setItem("token", this.state.userID);
+            localStorage.setItem("issuerToken", this.state.userID);
             this.setState({
                 loggedIn: true,
             });

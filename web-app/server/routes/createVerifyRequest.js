@@ -50,7 +50,6 @@ router.post('/', async (req, res) => {
         }
     } catch (error) {
         console.log(` ... Failed to submit Transaction to the ledger ${error} ... `);
-        process.exit(1);
     }
 
 });

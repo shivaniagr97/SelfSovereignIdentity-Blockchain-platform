@@ -50,9 +50,9 @@ class registerVerifier extends Component {
         };
         let response = await axios.post(ADDRESS + `createVerifier`, userDetails);
         if (typeof response.data === "object") {
-            localStorage.setItem("token", this.state.userID);
+            localStorage.setItem("verifierToken", this.state.userID);
             this.setState({
-                loggedIn: true,
+                isRegistered: true,
             });
         } else {
             this.setState({

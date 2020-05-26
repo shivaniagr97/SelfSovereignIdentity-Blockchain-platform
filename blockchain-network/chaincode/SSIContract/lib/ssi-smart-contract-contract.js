@@ -199,14 +199,228 @@ class SsiSmartContractContract extends Contract {
         args = JSON.parse(args);
 
         let issueRequests = [];
+        let accessDocumentInfo = {};
+
         let issuer = await new Issuer(args.issuerID, args.password, args.issuerType, args.city, args.state,
             args.pinCode, args.contact, args.email);
         issuer.issueRequests = issueRequests;
+        issuer.accessDocumentInfo = accessDocumentInfo;
 
         await ctx.stub.putState(issuer.issuerID, Buffer.from(JSON.stringify(issuer)));
 
         let response = `Issuer with issuer id ${issuer.issuerID} is updated in the world state`;
         return response;
+    }
+
+    /**
+     *
+     * @param ctx
+     * @param args
+     * @returns {Promise<any|*[]|void>}
+     */
+    async readHolderAssets(ctx, args) {
+        args = JSON.parse(args);
+        let holderExists = await this.assetExists(ctx, args.userID);
+        if (holderExists) {
+            let holderAsBytes = await ctx.stub.getState(args.userID);
+            let holder = JSON.parse(holderAsBytes);
+            let assetExists = await this.assetExists(ctx, args.assetId);
+            if (assetExists) {
+                let index = -1;
+                if (args.listType === 'trustedContacts') {
+                    index = holder.trustedContacts.indexOf(args.assetId);
+                } else if (args.listType === 'issueRequests') {
+                    index = holder.issueRequests.indexOf(args.assetId);
+                } else if (args.listType === 'verifyRequests') {
+                    index = holder.verifyRequests.indexOf(args.assetId);
+                } else if (args.listType === 'accessRights') {
+                    if (holder.accessRights.hasOwnProperty(args.assetId)) {
+                        let accessList = holder.accessRights[args.assetId] || [];
+                        return await this.modifyAccessRightsInfo(ctx, args, accessList);
+                    }
+                } else if (args.listType === 'requesters') {
+                    if (holder.requesters.hasOwnProperty(args.assetId)) {
+                        let documentList = holder.requesters[args.assetId] || [];
+                        return await this.modifyRequesterInfo(ctx, args, documentList);
+                    }
+                }
+                if (index > -1) {
+                    return await this.modifyAssetInfo(ctx, args.assetId);
+                } else {
+                    throw new Error(`asset not found`);
+                }
+            }
+        } else {
+            throw new Error(`holder with id ${args.userID} doesn't exist`);
+        }
+    }
+
+    /**
+     *
+     * @param ctx
+     * @param args
+     * @param accessList
+     * @returns {Promise<[]>}
+     */
+    async modifyAccessRightsInfo(ctx, args, accessList) {
+        let documentAsBytes = await ctx.stub.getState(args.assetId);
+        let document = JSON.parse(documentAsBytes);
+        let assets = [];
+        //push the document along with the list of all the accessed contacts
+        assets.push(document);
+        for (let i = 0; i < accessList.length; i++) {
+            let requester = await this.modifyAssetInfo(ctx, accessList[i]);
+            assets.push(requester);
+        }
+        return assets;
+    }
+
+    /**
+     *
+     * @param ctx
+     * @param args
+     * @param documentList
+     * @returns {Promise<[]>}
+     */
+    async modifyRequesterInfo(ctx, args, documentList) {
+        let requester = await this.modifyAssetInfo(ctx, args.assetId);
+        let assets = [];
+        //push the requester along with all the documents requested
+        assets.push(requester);
+        assets.concat(documentList);
+        for (let i = 0; i < documentList.length; i++) {
+            assets.push(documentList[i]);
+        }
+        return assets;
+    }
+
+    /**
+     *
+     * @param ctx
+     * @param assetId
+     * @returns {Promise<any>}
+     */
+    async modifyAssetInfo(ctx, assetId) {
+        let assetAsBytes = await ctx.stub.getState(assetId);
+        let asset = JSON.parse(assetAsBytes);
+        delete asset.password;
+        delete asset.state;
+        delete asset.pinCode;
+        delete asset.city;
+        delete asset.address;
+        delete asset.dateOfBirth;
+        delete asset.verifyRequests;
+        delete asset.issueRequests;
+        delete asset.accessRights;
+        delete asset.accessDocumentInfo;
+        delete asset.trustedContacts;
+        delete asset.requesters;
+        return asset;
+    }
+
+    /**
+     *
+     * @param ctx
+     * @param args
+     * @returns {Promise<any|*>}
+     */
+    async readVerifierAssets(ctx, args) {
+        args = JSON.parse(args);
+        let verifierExists = await this.assetExists(ctx, args.verifierID);
+        if (verifierExists) {
+            let verifierAsBytes = await ctx.stub.getState(args.verifierID);
+            let verifier = JSON.parse(verifierAsBytes);
+            let assetExists = await this.assetExists(ctx, args.assetId);
+            if (assetExists) {
+                if (args.listType === 'verifyRequests') {
+                    let index = verifier.verifyRequests.indexOf(args.assetId);
+                    if (index > -1) {
+                        return await this.modifyAssetInfo(ctx, args.assetId);
+                    }
+                } else if (args.listType === 'accessDocumentInfo') {
+                    if (verifier.accessDocumentInfo.hasOwnProperty(args.assetId)) {
+                        let documentList = verifier.accessDocumentInfo[args.assetId] || [];
+                        return await this.readDocumentsInfo(ctx, args.assetId, documentList, verifier.verifierID);
+                    }
+                }
+            } else {
+                throw new Error(`asset with asset id ${args.assetId} doesnt exits`);
+            }
+        } else {
+            throw new Error(`verifier with verifier id ${args.userID} doesnt exits`);
+        }
+
+    }
+
+    /**
+     * @param ctx
+     * @param args
+     * @returns {Promise<any|*>}
+     */
+    async readIssuerAssets(ctx, args) {
+        args = JSON.parse(args);
+        let issuerExists = await this.assetExists(ctx, args.issuerID);
+        if (issuerExists) {
+            let issuerAsBytes = await ctx.stub.getState(args.issuerID);
+            let issuer = JSON.parse(issuerAsBytes);
+            let assetExists = await this.assetExists(ctx, args.assetId);
+            if (assetExists) {
+                if (args.listType === 'issueRequests') {
+                    let index = issuer.issueRequests.indexOf(args.assetId);
+                    if (index > -1) {
+                        return await this.modifyAssetInfo(ctx, args.assetId);
+                    }
+                } else if (args.listType === 'accessDocumentInfo') {
+                    if (issuer.accessDocumentInfo.hasOwnProperty(args.assetId)) {
+                        let documentList = issuer.accessDocumentInfo[args.assetId] || [];
+                        return await this.readDocumentsInfo(ctx, args.assetId, documentList, issuer.issuerID);
+                    }
+                }
+            } else {
+                throw new Error(`asset with asset id ${args.assetId} doesnt exits`);
+            }
+        } else {
+            throw new Error(`issuer with issuer id ${args.userID} doesnt exits`);
+        }
+    }
+
+    /**
+     *
+     * @param ctx
+     * @param assetId
+     * @param documentList
+     * @param requesterId
+     * @returns {Promise<[]>}
+     */
+    async readDocumentsInfo(ctx, assetId, documentList, requesterId) {
+        let holderAsBytes = await ctx.stub.getState(assetId);
+        let holder = JSON.parse(holderAsBytes);
+        let accessRights = holder.accessRights;
+        delete holder.password;
+        delete holder.state;
+        delete holder.pinCode;
+        delete holder.city;
+        delete holder.address;
+        delete holder.dateOfBirth;
+        delete holder.verifyRequests;
+        delete holder.issueRequests;
+        delete holder.accessRights;
+        delete holder.trustedContacts;
+        delete holder.requesters;
+        let assets = [];
+        //push the requester along with all the documents requested
+        assets.push(holder);
+        for (let i = 0; i < documentList.length; i++) {
+            if (accessRights.hasOwnProperty(documentList[i])) {
+                let index = accessRights[documentList[i]].indexOf(requesterId);
+                if (index > -1) {
+                    let documentAsBytes = await ctx.stub.getState(documentList[i]);
+                    let document = JSON.parse(documentAsBytes);
+                    assets.push(document);
+                }
+            }
+        }
+        return assets;
     }
 
     /**
@@ -219,10 +433,12 @@ class SsiSmartContractContract extends Contract {
         args = JSON.parse(args);
 
         let verifyRequests = [];
+        let accessDocumentInfo = {};
 
         let verifier = await new Verifier(args.verifierID, args.password, args.contact, args.email, args.docTypes);
 
         verifier.verifyRequests = verifyRequests;
+        verifier.accessDocumentInfo = accessDocumentInfo;
 
         await ctx.stub.putState(verifier.verifierID, Buffer.from(JSON.stringify(verifier)));
 
@@ -268,7 +484,6 @@ class SsiSmartContractContract extends Contract {
     }
 
     /**
-     *
      * @param ctx
      * @param args
      * @param requestID
@@ -476,7 +691,7 @@ class SsiSmartContractContract extends Contract {
             let holderAsBytes = await ctx.stub.getState(args.holderID);
             let holder = JSON.parse(holderAsBytes);
             let requesters = holder.requesters;
-            requesters[args.requesterID].push(args.documentsRequested);
+            requesters[args.requesterID] = args.documentsRequested;
 
             await ctx.stub.putState(holder.userID, Buffer.from(JSON.stringify(holder)));
 
@@ -505,14 +720,21 @@ class SsiSmartContractContract extends Contract {
             holder.requesters = requesters;
 
             //add permissions
-            let documentID;
-            for (documentID in args.permissionedIDs) {
-                holder.accessRights[documentID].push(args.requesterID);
+            for (let i = 0; i < args.permissionedIDs.length; i++) {
+                if (holder.accessRights.hasOwnProperty(args.permissionedIDs[i])) {
+                    holder.accessRights[args.permissionedIDs[i]].push(args.requesterID);
+                }
             }
+
+            //update the list of the documents that have been allowed for the requester to access
+            let requesterAsBytes = await ctx.stub.getState(args.requesterID);
+            let requester = JSON.stringify(requesterAsBytes);
+            requester.accessDocumentInfo[holder.userID] = args.permissionedIDs;
+            await ctx.stub.putState(args.requesterID, Buffer.from(JSON.stringify(requester)));
 
             await ctx.stub.putState(args.holderID, Buffer.from(JSON.stringify(holder)));
 
-            let response = `Access has been provided to the requester with the id ${args.requesterId}`;
+            let response = `Access has been provided to the requester with the id ${args.requesterID}`;
             return response;
         }
         throw new Error(`this requester with id ${args.requesterID} or the holder with id ${args.holderID} doesn't exist`)
@@ -537,6 +759,12 @@ class SsiSmartContractContract extends Contract {
                 accessRights[args.documentID].splice(index, 1);
                 holder.accessRights = accessRights;
             }
+            //remove the list of the documents that have been allowed for the requester to access
+            let requesterAsBytes = await ctx.stub.getState(args.requesterID);
+            let requester = JSON.stringify(requesterAsBytes);
+            delete requester.accessDocumentInfo[holder.userID];
+            await ctx.stub.putState(args.requesterID, Buffer.from(JSON.stringify(requester)));
+
             await ctx.stub.putState(args.holderID, Buffer.from(JSON.stringify(holder)));
 
             let response = `Access has been revoked to the requester with the id ${args.requesterId} for document

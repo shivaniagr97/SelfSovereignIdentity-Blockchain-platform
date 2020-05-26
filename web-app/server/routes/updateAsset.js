@@ -39,6 +39,7 @@ router.post('/', async (req, res) => {
 
             // Submit the specified transaction.
             req.body.id = req.body.userID;
+            delete req.body.sessionKey;
             console.log(req.body);
             let response = await contract.submitTransaction('updateAsset', JSON.stringify(req.body));
             response = JSON.stringify(response.toString());

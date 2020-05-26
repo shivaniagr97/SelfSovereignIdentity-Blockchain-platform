@@ -77,7 +77,6 @@ router.post('/', async (req, res) => {
     } catch (error) {
         console.error(`Failed to register user ${req.body.verifierID}: ${error}`);
         res.send("Failed to register user");
-        process.exit(1);
     }
 });
 
@@ -113,7 +112,6 @@ async function registerInLedger(req) {
 
     } catch (error) {
         console.log(` ... Failed to submit Transaction to the ledger ${error} ... `);
-        process.exit(1);
     }
 }
 

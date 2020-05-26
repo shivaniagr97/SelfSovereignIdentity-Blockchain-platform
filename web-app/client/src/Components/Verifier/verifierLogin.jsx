@@ -10,9 +10,9 @@ class verifierLogin extends Component {
     constructor(props) {
         super(props);
 
-        const token = localStorage.getItem("token");
+        const verifierToken = localStorage.getItem("verifierToken");
         let loggedIn = true;
-        if (token == null) {
+        if (verifierToken == null) {
             loggedIn = false;
         }
         this.state = {
@@ -53,7 +53,7 @@ class verifierLogin extends Component {
         let response = await axios.post(ADDRESS + `verifyPassword`, userCredentials);
 
         if (typeof response.data === "object") {
-            localStorage.setItem("token", this.state.userID);
+            localStorage.setItem("verifierToken", this.state.userID);
             this.setState({
                 loggedIn: true,
             });
