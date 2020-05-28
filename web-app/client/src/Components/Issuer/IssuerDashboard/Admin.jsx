@@ -6,7 +6,7 @@ import "perfect-scrollbar/css/perfect-scrollbar.css";
 import {makeStyles} from "@material-ui/core/styles";
 import Navbar from "../../../UIComponents/Navbars/Navbar.jsx";
 import Sidebar from "../../../UIComponents/Sidebar/Sidebar.jsx";
-import routes from "./userRoutes.jsx";
+import routes from "./issuerRoutes.jsx";
 import styles from "../../../assets/jss/material-dashboard-react/layouts/adminStyle.js";
 import bgImage from "../../../assets/img/sidebar-2.jpg";
 import logo from "../../../assets/img/holder.png";
@@ -19,11 +19,11 @@ const useStyles = makeStyles(styles);
 export default function Admin({...rest}) {
     const classes = useStyles();
     const mainPanel = React.createRef();
-    console.log(localStorage.getItem('userToken'));
+    console.log(localStorage.getItem('issuerToken'));
 
     // states and functions
     const [image, setImage] = React.useState(bgImage);
-    const [userData, setUserData] = React.useState({});
+    const [issuerData, setIssuerData] = React.useState({});
     const [logOut, setLogOut] = React.useState(false);
     const [color, setColor] = React.useState("blue");
     const [mobileOpen, setMobileOpen] = React.useState(false);
@@ -42,33 +42,33 @@ export default function Admin({...rest}) {
 
     // initialize and destroy the PerfectScrollbar plugin
     React.useEffect(() => {
-        //first fetch the data from the backend about the user
-        const fetchUserData = async () => {
+        //first fetch the data from the backend about the issuer
+        const fetchIssuerData = async () => {
             console.log("here");
             try {
-                let userCredentials = JSON.parse(localStorage.getItem('userToken'));
-                if (!userCredentials) {
+                let issuerCredentials = JSON.parse(localStorage.getItem('issuerToken'));
+                if (!issuerCredentials) {
                     setLogOut(true);
                 } else {
-                    userCredentials.type = "user";
-                    console.log(userCredentials);
-                    let response = await axios.post(ADDRESS + `readAsset`, userCredentials);
+                    issuerCredentials.type = "issuer";
+                    console.log(issuerCredentials);
+                    let response = await axios.post(ADDRESS + `readAsset`, issuerCredentials);
                     if (response !== null) {
                         response = response.data;
                         response = JSON.parse(response);
-                        response.sessionKey = userCredentials.sessionKey;
+                        response.sessionKey = issuerCredentials.sessionKey;
                         console.log(response);
-                        setUserData(response || {});
+                        setIssuerData(response || {});
                     }
                 }
             } catch (e) {
                 console.log(e);
             }
         };
-        localStorage.setItem("token", localStorage.getItem("userToken"));
-        console.log(Object.keys(userData).length === 0);
-        if (!Object.keys(userData).length)
-            fetchUserData();
+        localStorage.setItem("token", localStorage.getItem("issuerToken"));
+        console.log(Object.keys(issuerData).length === 0);
+        if (!Object.keys(issuerData).length)
+            fetchIssuerData();
         if (navigator.platform.indexOf("Win") > -1) {
             ps = new PerfectScrollbar(mainPanel.current, {
                 suppressScrollX: true,
@@ -99,7 +99,7 @@ export default function Admin({...rest}) {
                     return (
                         <Route
                             path={prop.layout + prop.path}
-                            render={(props) => <prop.component {...props} userData={userData}/>}
+                            render={(props) => <prop.component {...props} issuerData={issuerData}/>}
                             key={key}
                         />
                     );
@@ -114,7 +114,7 @@ export default function Admin({...rest}) {
         <div className={classes.wrapper}>
             <Sidebar
                 routes={routes}
-                logoText={"Holder"}
+                logoText={"Issuer"}
                 logo={logo}
                 image={image}
                 handleDrawerToggle={handleDrawerToggle}

@@ -16,6 +16,8 @@ router.post('/', async (req, res) => {
 
 
     try {
+        console.log(req.body);
+
         let sessionKeyExists = await handler.verifySessionKey(req.body.holderID, req.body.sessionKey);
         if (!sessionKeyExists) {
             res.send("Incorrect");

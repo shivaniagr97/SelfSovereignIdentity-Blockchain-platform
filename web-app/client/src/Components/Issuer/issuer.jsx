@@ -1,8 +1,8 @@
 import React, {Component} from 'react';
 import {HashRouter as Router, Route} from 'react-router-dom';
 import issuerLogin from "./issuerLogin";
-import issuerPage from "./issuerPage";
 import registerIssuer from "./registerIssuer";
+import Admin from "./IssuerDashboard/Admin";
 
 class issuer extends Component {
     render() {
@@ -12,7 +12,7 @@ class issuer extends Component {
                 </Route>
                 <Route exact path="/" component={issuerLogin}>
                 </Route>
-                <Route exact path="/home" component={issuerPage}>
+                <Route path="/home" component={Admin}>
                 </Route>
             </Router>
         );
