@@ -9,7 +9,7 @@ import FormSwitcher from "./FormSwitcher";
 class verifierLogin extends Component {
     constructor(props) {
         super(props);
-
+        localStorage.clear();
         const verifierToken = localStorage.getItem("verifierToken");
         let loggedIn = true;
         if (verifierToken == null) {
@@ -18,6 +18,7 @@ class verifierLogin extends Component {
         this.state = {
             userID: '',
             password: '',
+            sessionKey: '',
             alertType: "danger",
             alertData: "",
             alertShow: false,
@@ -51,11 +52,17 @@ class verifierLogin extends Component {
         };
 
         let response = await axios.post(ADDRESS + `verifyPassword`, userCredentials);
+        response = response.data;
 
-        if (typeof response.data === "object") {
-            localStorage.setItem("verifierToken", this.state.userID);
+        if (response.data !== "Incorrect" && response.data !== "Failed to verify password") {
+            let verifierToken = {
+                userID: this.state.userID,
+                sessionKey: response.data
+            };
+            localStorage.setItem("verifierToken", JSON.stringify(verifierToken));
             this.setState({
                 loggedIn: true,
+                sessionKey: response.data
             });
         } else {
             this.setState({
@@ -72,8 +79,7 @@ class verifierLogin extends Component {
             return <Redirect to={{
                 pathname: 'home',
             }}/>;
-        }
-        else {
+        } else {
 
             return (
                 <div className="App">
@@ -103,7 +109,6 @@ class verifierLogin extends Component {
                             </form>
                         </div>
                     </div>
-
                 </div>
             );
         }

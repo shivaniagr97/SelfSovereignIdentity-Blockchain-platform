@@ -32,18 +32,18 @@ const styles = {
 
 const useStyles = makeStyles(styles);
 
-export default function IssuerProfile(props) {
+export default function VerifierProfile(props) {
     const classes = useStyles();
-    localStorage.setItem("token", localStorage.getItem("issuerToken"));
-    const [issuerData, setIssuerData] = React.useState(props.issuerData);
-    console.log(issuerData);
+    localStorage.setItem("token", localStorage.getItem("verifierToken"));
+    const [verifierData, setVerifierData] = React.useState(props.verifierData);
+    console.log(verifierData);
 
     const handleChange = (event) => {
         event.preventDefault();
         console.log(event.target.name);
         console.log(event.target.value);
-        issuerData[event.target.name] = event.target.value;
-        setIssuerData(issuerData);
+        verifierData[event.target.name] = event.target.value;
+        setVerifierData(verifierData);
         console.log("here");
     };
 
@@ -51,14 +51,15 @@ export default function IssuerProfile(props) {
         event.preventDefault();
         let response = "";
         try {
-            console.log(issuerData);
-            issuerData.userID = issuerData.issuerID;
-            response = await axios.post(ADDRESS + `updateAsset`, issuerData);
+            console.log(verifierData);
+            verifierData.userID = verifierData.verifierID;
+            response = await axios.post(ADDRESS + `updateAsset`, verifierData);
             response = response.data;
+            console.log(response);
             if (response === "Correct") {
                 console.log(response);
-                delete issuerData.password;
-                setIssuerData(issuerData);
+                delete verifierData.password;
+                setVerifierData(verifierData);
             } else {
                 //show error message
                 console.log(response);
@@ -90,34 +91,34 @@ export default function IssuerProfile(props) {
                                         name={"contact"}
                                         autoComplete={"Contact"}
                                         readOnly={false}
-                                        value={issuerData.contact || ''}
+                                        value={verifierData.contact || ''}
                                         handleChange={handleChange}
                                     />
                                 </GridItem>
                                 <GridItem xs={12} sm={12} md={3}>
                                     <CustomInput
-                                        labelText="IssuerName"
-                                        id="issuerID"
+                                        labelText="VerifierName"
+                                        id="verifierID"
                                         formControlProps={{
                                             fullWidth: true
                                         }}
-                                        name={"issuerID"}
-                                        autoComplete={"issuerID"}
+                                        name={"userID"}
+                                        autoComplete={"verifierID"}
                                         readOnly={true}
-                                        value={issuerData.issuerID || ''}
+                                        value={verifierData.verifierID || ''}
                                     />
                                 </GridItem>
                                 <GridItem xs={12} sm={12} md={3}>
                                     <CustomInput
-                                        labelText="IssuerType"
-                                        id="issuerType"
+                                        labelText="VerifierType"
+                                        id="verifierType"
                                         formControlProps={{
                                             fullWidth: true
                                         }}
-                                        name={"issuerType"}
-                                        autoComplete={"issuerType"}
+                                        name={"verifierType"}
+                                        autoComplete={"verifierType"}
                                         readOnly={true}
-                                        value={issuerData.issuerType || ''}
+                                        value={verifierData.docTypes || ''}
                                     />
                                 </GridItem>
                                 <GridItem xs={12} sm={12} md={4}>
@@ -130,49 +131,7 @@ export default function IssuerProfile(props) {
                                         name={"email"}
                                         autoComplete={"email"}
                                         readOnly={false}
-                                        value={issuerData.email || ''}
-                                        handleChange={handleChange}
-                                    />
-                                </GridItem>
-                                <GridItem xs={12} sm={12} md={4}>
-                                    <CustomInput
-                                        labelText="City"
-                                        id="city"
-                                        formControlProps={{
-                                            fullWidth: true
-                                        }}
-                                        name={"city"}
-                                        autoComplete={"city"}
-                                        readOnly={false}
-                                        value={issuerData.city || ''}
-                                        handleChange={handleChange}
-                                    />
-                                </GridItem>
-                                <GridItem xs={12} sm={12} md={4}>
-                                    <CustomInput
-                                        labelText="State"
-                                        id="state"
-                                        formControlProps={{
-                                            fullWidth: true
-                                        }}
-                                        name={"state"}
-                                        autoComplete={"state"}
-                                        readOnly={false}
-                                        value={issuerData.state || ''}
-                                        handleChange={handleChange}
-                                    />
-                                </GridItem>
-                                <GridItem xs={12} sm={12} md={4}>
-                                    <CustomInput
-                                        labelText="Postal Code"
-                                        id="postal-code"
-                                        formControlProps={{
-                                            fullWidth: true
-                                        }}
-                                        name={"pinCode"}
-                                        autoComplete={"pinCode"}
-                                        readOnly={false}
-                                        value={issuerData.pinCode || ''}
+                                        value={verifierData.email || ''}
                                         handleChange={handleChange}
                                     />
                                 </GridItem>
@@ -186,7 +145,7 @@ export default function IssuerProfile(props) {
                                         name={"password"}
                                         autoComplete={"password"}
                                         readOnly={false}
-                                        value={issuerData.password || ''}
+                                        value={verifierData.password || ''}
                                         type={'password'}
                                         handleChange={handleChange}
                                     />

@@ -54,6 +54,7 @@ async function verifySessionKey(userId, sessionKey) {
         };
         client = await mongo.connect(url);
         let result = await client.db('SSI').collection('activeUsersList').findOne(user);
+        console.log(user);
         let decryptedKey = decrypt(sessionKey, result);
         if (decryptedKey === result.sessionKey) {
             userPresent = true;
