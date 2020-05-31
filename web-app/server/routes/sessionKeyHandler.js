@@ -36,6 +36,7 @@ async function generateSessionKey(userId) {
             iv: encrypted.iv
         };
         client = await mongo.connect(url);
+        console.log(user);
         await client.db('SSI').collection('activeUsersList').insertOne(user);
         console.log("the sessionKey is successfully stored " + sessionKey);
         return encrypted.encryptedData.toString();

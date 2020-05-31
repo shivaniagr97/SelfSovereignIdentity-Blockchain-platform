@@ -36,8 +36,10 @@ router.post('/', async (req, res) => {
             // Get the contract from the network.
             const contract = network.getContract('SSIContract');
 
+            console.log(req.body);
+
             // Submit the specified transaction.
-            let response = await contract.submitTransaction('revokeAccess', req.body);
+            let response = await contract.submitTransaction('revokeAccess', JSON.stringify(req.body));
             response = JSON.stringify(response.toString());
             console.log(response);
 

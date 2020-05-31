@@ -486,7 +486,6 @@ class SsiSmartContractContract extends Contract {
     /**
      * @param ctx
      * @param args
-     * @param requestID
      * @returns {Promise<string>}
      */
     async issueIdentity(ctx, args) {
@@ -573,7 +572,7 @@ class SsiSmartContractContract extends Contract {
         let identity = JSON.parse(identityAsBytes);
         let verifier = JSON.parse(verifierAsBytes);
 
-        if (!verifier.docTypes.contains(identity.documentType)) {
+        if (verifier.docTypes.indexOf(identity.documentType) < 0) {
             throw new Error(`Verifier id ${verifierID} does not have access to verify`);
         }
 
@@ -638,6 +637,7 @@ class SsiSmartContractContract extends Contract {
      * @param documentID
      * @param verifierID
      * @param timeStamp
+     * @param requestId
      * @returns {Promise<string>}
      */
     async verifyRequest(ctx, holderID, documentID, verifierID, timeStamp, requestId) {
@@ -652,7 +652,7 @@ class SsiSmartContractContract extends Contract {
             let verifier = JSON.parse(verifierAsBytes);
             let documentAsBytes = await ctx.stub.getState(documentID);
             let document = JSON.parse(documentAsBytes);
-            if (verifier.docTypes.contains(document.documentType)) {
+            if (verifier.docTypes.indexOf(document.documentType) > -1) {
                 //create new verify request
                 let verifyRequest = await new VerifyRequest(holderID, verifierID, documentID, timeStamp, requestId);
                 verifyRequest.status = 'processing';
@@ -667,6 +667,7 @@ class SsiSmartContractContract extends Contract {
 
                 //update verifyRequests list at verifier
                 verifier.verifyRequests.push(verifyRequest.requestID);
+                verifier.accessDocumentInfo[holder.userID] = [documentID];
                 await ctx.stub.putState(verifierID, Buffer.from(JSON.stringify(verifier)));
 
                 let response = `Verification Request with request id ${verifyRequest.requestID} has been created in
@@ -712,24 +713,28 @@ class SsiSmartContractContract extends Contract {
         let holderExists = await this.assetExists(ctx, args.holderID);
         if (requesterExists && holderExists) {
             let holderAsBytes = await ctx.stub.getState(args.holderID);
-            let holder = JSON.stringify(holderAsBytes);
+            let holder = JSON.parse(holderAsBytes);
 
             //remove requester from list
-            let requesters = holder.requesters;
-            delete requesters[args.requesterID];
-            holder.requesters = requesters;
+            if (holder.hasOwnProperty('requesters') && holder.requesters.hasOwnProperty(args.requesterID)) {
+                delete holder.requesters[args.requesterID];
+            }
 
             //add permissions
             for (let i = 0; i < args.permissionedIDs.length; i++) {
-                if (holder.accessRights.hasOwnProperty(args.permissionedIDs[i])) {
-                    holder.accessRights[args.permissionedIDs[i]].push(args.requesterID);
+                if (holder.hasOwnProperty('accessRights') && holder.accessRights.hasOwnProperty(args.permissionedIDs[i])) {
+                    let accessRightsUserList = holder.accessRights[args.permissionedIDs[i]] || [];
+                    accessRightsUserList.push(args.requesterID);
+                    holder.accessRights[args.permissionedIDs[i]] = accessRightsUserList;
                 }
             }
 
             //update the list of the documents that have been allowed for the requester to access
             let requesterAsBytes = await ctx.stub.getState(args.requesterID);
-            let requester = JSON.stringify(requesterAsBytes);
-            requester.accessDocumentInfo[holder.userID] = args.permissionedIDs;
+            let requester = JSON.parse(requesterAsBytes);
+            if (requester.hasOwnProperty('accessDocumentInfo')) {
+                requester.accessDocumentInfo[holder.userID] = args.permissionedIDs || [];
+            }
             await ctx.stub.putState(args.requesterID, Buffer.from(JSON.stringify(requester)));
 
             await ctx.stub.putState(args.holderID, Buffer.from(JSON.stringify(holder)));
@@ -738,6 +743,22 @@ class SsiSmartContractContract extends Contract {
             return response;
         }
         throw new Error(`this requester with id ${args.requesterID} or the holder with id ${args.holderID} doesn't exist`)
+    }
+
+    /**
+     *
+     * @param requesterID
+     * @param accessRights
+     * @returns {Promise<boolean>}
+     */
+    async checkAccessAfterDeletion(requesterID, accessRights) {
+        let documentIds = Object.keys(accessRights);
+        for (let i = 0; i < documentIds.length; i++) {
+            if (accessRights[documentIds[i]].indexOf(requesterID) > -1) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -752,27 +773,37 @@ class SsiSmartContractContract extends Contract {
         let holderExists = await this.assetExists(ctx, args.holderID);
         if (requesterExists && holderExists) {
             let holderAsBytes = await ctx.stub.getState(args.holderID);
-            let holder = JSON.stringify(holderAsBytes);
-            let accessRights = holder.accessRights;
-            if (args.requesterID in accessRights[args.documentID]) {
-                let index = accessRights[args.documentID].indexOf(args.requesterID);
-                accessRights[args.documentID].splice(index, 1);
-                holder.accessRights = accessRights;
+            let holder = JSON.parse(holderAsBytes);
+
+            if (holder.hasOwnProperty('accessRights') && holder.accessRights.hasOwnProperty(args.documentID) && holder.accessRights[args.documentID].indexOf(args.requesterID) > -1) {
+                let index = holder.accessRights[args.documentID].indexOf(args.requesterID);
+                holder.accessRights[args.documentID].splice(index, 1);
             }
+
             //remove the list of the documents that have been allowed for the requester to access
             let requesterAsBytes = await ctx.stub.getState(args.requesterID);
-            let requester = JSON.stringify(requesterAsBytes);
-            delete requester.accessDocumentInfo[holder.userID];
+            let requester = JSON.parse(requesterAsBytes);
+            //check if any other document is permissioned if not delete the holder for the requester
+            if (holder.hasOwnProperty('accessRights')) {
+                let stillExists = await this.checkAccessAfterDeletion(args.requesterID, holder.accessRights);
+                if (!(stillExists)) {
+                    if (requester.hasOwnProperty('accessDocumentInfo')) {
+                        delete requester.accessDocumentInfo[holder.userID];
+                    }
+                }
+            }
+
             await ctx.stub.putState(args.requesterID, Buffer.from(JSON.stringify(requester)));
 
             await ctx.stub.putState(args.holderID, Buffer.from(JSON.stringify(holder)));
 
-            let response = `Access has been revoked to the requester with the id ${args.requesterId} for document
+            let response = `Access has been revoked to the requester with the id ${args.requesterID} for document
             ${args.documentID}`;
             return response;
         }
         throw new Error(`this requester with id ${args.requesterID} or the holder with id ${args.holderID} doesn't exist`)
     }
+
 
     /**
      *

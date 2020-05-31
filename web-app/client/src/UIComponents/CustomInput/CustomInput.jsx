@@ -29,6 +29,7 @@ export default function CustomInput(props) {
         name,
         autoComplete,
         readOnly,
+        style,
         type
     } = props;
 
@@ -71,6 +72,7 @@ export default function CustomInput(props) {
                 autoComplete={autoComplete}
                 id={id}
                 type={type}
+                style={style}
                 {...inputProps}
             />
             {error ? (
@@ -95,5 +97,6 @@ CustomInput.propTypes = {
     name: PropTypes.string,
     autoComplete: PropTypes.string,
     readOnly: PropTypes.bool.isRequired,
+    style: PropTypes.object,
     type: PropTypes.string
 };

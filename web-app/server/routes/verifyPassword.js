@@ -29,7 +29,11 @@ router.post('/', async (req, res) => {
         const contract = network.getContract('SSIContract');
 
         // Submit the specified transaction.
-        let response = await contract.submitTransaction('verifyPassword', JSON.stringify(req.body));
+        let response = await contract.submitTransaction('readAsset', req.body.userID);
+        console.log(response.toString());
+        response = JSON.parse(response);
+        console.log(response);
+        response = await contract.submitTransaction('verifyPassword', JSON.stringify(req.body));
         response = JSON.parse(response.toString());
         console.log(response);
 

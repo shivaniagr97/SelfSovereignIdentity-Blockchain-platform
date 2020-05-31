@@ -21,10 +21,12 @@ export default function GridContainer(props) {
         justify,
         alignItems,
         alignContent,
-      ...rest
+        direction,
+        ...rest
     } = props;
     return (
         <Grid container {...rest} className={classes.grid} justify={justify} alignItems={alignItems}
+              direction={direction}
               alignContent={alignContent}>
             {children}
         </Grid>
@@ -36,4 +38,5 @@ GridContainer.propTypes = {
     justify: PropTypes.string,
     alignContent: PropTypes.string,
     alignItems: PropTypes.string,
+    direction: PropTypes.string,
 };

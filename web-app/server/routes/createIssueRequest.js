@@ -36,6 +36,7 @@ router.post('/', async (req, res) => {
 
             // Get the contract from the network.
             const contract = network.getContract('SSIContract');
+            req.body.issueRequestId = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
 
             // Submit the specified transaction.
             let response = await contract.submitTransaction('issueRequest', req.body.userID, req.body.issuerID,

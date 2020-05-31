@@ -37,8 +37,11 @@ router.post('/', async (req, res) => {
             const contract = network.getContract('SSIContract');
 
             // Submit the specified transaction.
+
+            req.body.verifyRequestId = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+            console.log(req.body);
             let response = await contract.submitTransaction('verifyRequest', req.body.userID, req.body.documentID,
-                req.body.verifierID, Date.now().toString());
+                req.body.verifierID, Date.now().toString(), req.body.verifyRequestId);
             response = JSON.stringify(response.toString());
             console.log(response);
 

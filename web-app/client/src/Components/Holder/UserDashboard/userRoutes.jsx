@@ -20,24 +20,17 @@ import Dashboard from "@material-ui/icons/Dashboard";
 import Person from "@material-ui/icons/Person";
 import ArrowUpward from "@material-ui/icons/ArrowUpward"
 import LibraryBooks from "@material-ui/icons/LibraryBooks";
-import BubbleChart from "@material-ui/icons/BubbleChart";
-import LocationOn from "@material-ui/icons/LocationOn";
-import Notifications from "@material-ui/icons/Notifications";
-import Unarchive from "@material-ui/icons/Unarchive";
-import Language from "@material-ui/icons/Language";
+import ContactsIcon from '@material-ui/icons/Contacts';
+
 // core components/views for Admin layout
 import DashboardPage from "./DashboardPage.jsx";
 import UserProfile from "./UserProfile.jsx";
 import UploadDocument from "./UploadDocument";
 import ViewDocuments from "./ViewDocuments";
-// import TableList from "views/TableList/TableList.js";
-// import Typography from "views/Typography/Typography.js";
-// import Icons from "views/Icons/Icons.js";
-// import Maps from "views/Maps/Maps.js";
-// import NotificationsPage from "views/Notifications/Notifications.js";
-// import UpgradeToPro from "views/UpgradeToPro/UpgradeToPro.js";
-// core components/views for RTL layout
-// import RTLPage from "views/RTLPage/RTLPage.js";
+import IssueRequest from "./issueRequest";
+import VerifyRequest from "./verifyRequest";
+import ManageAccess from "./manageAccess";
+
 
 const dashboardRoutes = [
     {
@@ -70,6 +63,30 @@ const dashboardRoutes = [
         rtlName: "طباعة",
         icon: LibraryBooks,
         component: ViewDocuments,
+        layout: "/home"
+    },
+    {
+        path: "/issueRequest",
+        name: "Issue Request",
+        rtlName: "طلب إصدار",
+        icon: ContactsIcon,
+        component: IssueRequest,
+        layout: "/home"
+    },
+    {
+        path: "/verifyRequest",
+        name: "Verify Request",
+        rtlName: "طلب إصدار",
+        icon: ContactsIcon,
+        component: VerifyRequest,
+        layout: "/home"
+    },
+    {
+        path: "/manageAccess",
+        name: "Manage Access",
+        rtlName: "طلب إصدار",
+        icon: ContactsIcon,
+        component: ManageAccess,
         layout: "/home"
     }
     // {

@@ -28,6 +28,9 @@ import Language from "@material-ui/icons/Language";
 // core components/views for Admin layout
 import DashboardPage from "./DashboardPage.jsx";
 import IssuerProfile from "./IssuerProfile.jsx";
+import IssueRequest from "./issueRequests.jsx";
+import UploadDocument from "../../Holder/UserDashboard/UploadDocument";
+import IssueIdentity from "./IssueIdentity";
 // import TableList from "views/TableList/TableList.js";
 // import Typography from "views/Typography/Typography.js";
 // import Icons from "views/Icons/Icons.js";
@@ -53,6 +56,22 @@ const dashboardRoutes = [
         icon: Person,
         component: IssuerProfile,
         layout: "/home"
+    },
+    {
+        path: "/issueRequests",
+        name: "Issue Requests",
+        rtlName: "طباعة",
+        icon: LibraryBooks,
+        component: IssueRequest,
+        layout: "/home"
+    },
+    {
+        path: "/issueIdentity",
+        name: "Issue Identity",
+        rtlName: "قائمة الجدول",
+        icon: ArrowUpward,
+        component: IssueIdentity,
+        layout: "/home"
     }
     // {
     //     path: "/uploadDocument",
@@ -62,14 +81,7 @@ const dashboardRoutes = [
     //     component: UploadDocument,
     //     layout: "/home"
     // },
-    // {
-    //     path: "/viewDocuments",
-    //     name: "View Documents",
-    //     rtlName: "طباعة",
-    //     icon: LibraryBooks,
-    //     component: ViewDocuments,
-    //     layout: "/home"
-    // }
+
     // {
     //     path: "/icons",
     //     name: "Icons",

@@ -37,7 +37,6 @@ export default function UploadDocument(props) {
     const classes = useStyles();
     localStorage.setItem("token", localStorage.getItem("userToken"));
     const [userData, setUserData] = React.useState(props.userData);
-    const [loaded, setLoaded] = React.useState(false);
     const [documentType, setDocumentType] = React.useState('');
     const [selectedDocumentFile, setSelectedDocumentFile] = React.useState('');
     console.log(userData);
@@ -52,7 +51,7 @@ export default function UploadDocument(props) {
             console.log(event.target.value);
             setDocumentType(event.target.value);
         }
-    }
+    };
 
     const submitDetails = async (event) => {
         event.preventDefault();
@@ -65,14 +64,9 @@ export default function UploadDocument(props) {
             data.append('time', new Date().toLocaleString());
             data.append('documentType', documentType);
             data.append('sessionKey', userData.sessionKey);
-            data.append('document', "test");
-            data.append('documentID', "test123");
-
-            setLoaded(true);
 
             console.log(data);
             response = await axios.post(ADDRESS + `createIdentity`, data);
-            setLoaded(false);
             response = response.data;
             if (response === 'Correct') {
                 setSelectedDocumentFile('');
@@ -84,7 +78,7 @@ export default function UploadDocument(props) {
             //show error message
             console.log(e);
         }
-    }
+    };
 
     return (
         <div>

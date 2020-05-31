@@ -101,6 +101,9 @@ async function registerInLedger(req) {
         const contract = network.getContract('SSIContract');
 
         // Submit the specified transaction.
+        let docTypes = [];
+        docTypes.push(req.body.docTypes);
+        req.body.docTypes = docTypes;
         let response = await contract.submitTransaction('createVerifier', JSON.stringify(req.body));
         response = JSON.stringify(response.toString());
         console.log(response);

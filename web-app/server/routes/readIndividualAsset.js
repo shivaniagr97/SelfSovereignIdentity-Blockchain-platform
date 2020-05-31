@@ -41,34 +41,47 @@ router.post('/', async (req, res) => {
 
             if (req.body.type === 'verifier') {
                 console.log("verifier side");
-                let assetsArray = req.body.verifyRequests || req.body.accessDocumentInfo;
-                response = [];
-                console.log(assetsArray);
-                for (let i = 0; i < assetsArray.length; i++) {
-                    req.body.assetId = assetsArray[i];
-                    console.log(req.body);
-                    let responseArray = await contract.submitTransaction('readVerifierAssets', JSON.stringify(req.body));
-                    responseArray = JSON.parse(responseArray.toString());
-                    console.log(responseArray);
-                    if (typeof responseArray === 'object') {
-                        response.push(responseArray);
+                if (req.body.listType === "verifyRequests") {
+                    response = await contract.submitTransaction('readIssuerAssets', JSON.stringify(req.body));
+                    response = JSON.parse(response.toString());
+                    console.log(response);
+                } else {
+                    let assetsArray = req.body.accessDocumentInfo;
+                    response = [];
+                    console.log(assetsArray);
+                    for (let i = 0; i < assetsArray.length; i++) {
+                        req.body.assetId = assetsArray[i];
+                        console.log(req.body);
+                        let responseArray = await contract.submitTransaction('readVerifierAssets', JSON.stringify(req.body));
+                        responseArray = JSON.parse(responseArray.toString());
+                        console.log(responseArray);
+                        if (typeof responseArray === 'object') {
+                            response.push(responseArray);
+                        }
                     }
                 }
             } else if (req.body.type === 'issuer') {
                 console.log("issuer side");
-                let assetsArray = req.body.issueRequests || req.body.accessDocumentInfo;
-                response = [];
-                console.log(assetsArray);
-                for (let i = 0; i < assetsArray.length; i++) {
-                    req.body.assetId = assetsArray[i];
-                    console.log(req.body);
-                    let responseArray = await contract.submitTransaction('readIssuerAssets', JSON.stringify(req.body));
-                    responseArray = JSON.parse(responseArray.toString());
-                    console.log(responseArray);
-                    if (typeof responseArray === 'object') {
-                        response.push(responseArray);
+                if (req.body.listType === "issueRequests") {
+                    response = await contract.submitTransaction('readIssuerAssets', JSON.stringify(req.body));
+                    response = JSON.parse(response.toString());
+                    console.log(response);
+                } else {
+                    let assetsArray = req.body.accessDocumentInfo;
+                    response = [];
+                    console.log(assetsArray);
+                    for (let i = 0; i < assetsArray.length; i++) {
+                        req.body.assetId = assetsArray[i];
+                        console.log(req.body);
+                        let responseArray = await contract.submitTransaction('readIssuerAssets', JSON.stringify(req.body));
+                        responseArray = JSON.parse(responseArray.toString());
+                        console.log(responseArray);
+                        if (typeof responseArray === 'object') {
+                            response.push(responseArray);
+                        }
                     }
                 }
+                console.log(response);
             } else if (req.body.type === 'holder') {
                 console.log("holder side");
                 let assetsArray = req.body.trustedContacts || req.body.issueRequests || req.body.verifyRequests || req.body.accessRights || req.body.requesters;
