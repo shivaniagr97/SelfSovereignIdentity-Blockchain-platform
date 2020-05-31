@@ -1,8 +1,8 @@
 import React, {Component} from 'react';
 import {HashRouter as Router, Route} from 'react-router-dom';
 import verifierLogin from "./verifierLogin";
-import verifierPage from "./verifierPage";
 import registerVerifier from "./registerVerifier";
+import Admin from "./VerifierDashboard/Admin";
 
 class verifier extends Component {
     render() {
@@ -12,7 +12,7 @@ class verifier extends Component {
                 </Route>
                 <Route exact path="/" component={verifierLogin}>
                 </Route>
-                <Route exact path="/home" component={verifierPage}>
+                <Route path="/home" component={Admin}>
                 </Route>
             </Router>
         );

@@ -32,18 +32,18 @@ const styles = {
 
 const useStyles = makeStyles(styles);
 
-export default function IssuerProfile(props) {
+export default function ServiceProviderProfile(props) {
     const classes = useStyles();
-    localStorage.setItem("token", localStorage.getItem("issuerToken"));
-    const [issuerData, setIssuerData] = React.useState(props.issuerData);
-    console.log(issuerData);
+    localStorage.setItem("token", localStorage.getItem("serviceProviderToken"));
+    const [serviceProviderData, setServiceProviderData] = React.useState(props.serviceProviderData);
+    console.log(serviceProviderData);
 
     const handleChange = (event) => {
         event.preventDefault();
         console.log(event.target.name);
         console.log(event.target.value);
-        issuerData[event.target.name] = event.target.value;
-        setIssuerData(issuerData);
+        serviceProviderData[event.target.name] = event.target.value;
+        setServiceProviderData(serviceProviderData);
         console.log("here");
     };
 
@@ -51,14 +51,14 @@ export default function IssuerProfile(props) {
         event.preventDefault();
         let response = "";
         try {
-            console.log(issuerData);
-            issuerData.userID = issuerData.issuerID;
-            response = await axios.post(ADDRESS + `updateAsset`, issuerData);
+            console.log(serviceProviderData);
+            serviceProviderData.userID = serviceProviderData.issuerID;
+            response = await axios.post(ADDRESS + `updateAsset`, serviceProviderData);
             response = response.data;
             if (response === "Correct") {
                 console.log(response);
-                delete issuerData.password;
-                setIssuerData(issuerData);
+                delete serviceProviderData.password;
+                setServiceProviderData(serviceProviderData);
             } else {
                 //show error message
                 console.log(response);
@@ -90,34 +90,34 @@ export default function IssuerProfile(props) {
                                         name={"contact"}
                                         autoComplete={"Contact"}
                                         readOnly={false}
-                                        value={issuerData.contact || ''}
+                                        value={serviceProviderData.contact || ''}
                                         handleChange={handleChange}
                                     />
                                 </GridItem>
                                 <GridItem xs={12} sm={12} md={3}>
                                     <CustomInput
-                                        labelText="IssuerName"
-                                        id="issuerID"
+                                        labelText="ServiceProviderName"
+                                        id="serviceProviderID"
                                         formControlProps={{
                                             fullWidth: true
                                         }}
                                         name={"issuerID"}
-                                        autoComplete={"issuerID"}
+                                        autoComplete={"serviceProviderID"}
                                         readOnly={true}
-                                        value={issuerData.issuerID || ''}
+                                        value={serviceProviderData.issuerID || ''}
                                     />
                                 </GridItem>
                                 <GridItem xs={12} sm={12} md={3}>
                                     <CustomInput
-                                        labelText="IssuerType"
-                                        id="issuerType"
+                                        labelText="ServiceProviderType"
+                                        id="serviceProviderType"
                                         formControlProps={{
                                             fullWidth: true
                                         }}
                                         name={"issuerType"}
-                                        autoComplete={"issuerType"}
+                                        autoComplete={"serviceType"}
                                         readOnly={true}
-                                        value={issuerData.issuerType || ''}
+                                        value={serviceProviderData.issuerType || ''}
                                     />
                                 </GridItem>
                                 <GridItem xs={12} sm={12} md={4}>
@@ -130,7 +130,7 @@ export default function IssuerProfile(props) {
                                         name={"email"}
                                         autoComplete={"email"}
                                         readOnly={false}
-                                        value={issuerData.email || ''}
+                                        value={serviceProviderData.email || ''}
                                         handleChange={handleChange}
                                     />
                                 </GridItem>
@@ -144,7 +144,7 @@ export default function IssuerProfile(props) {
                                         name={"city"}
                                         autoComplete={"city"}
                                         readOnly={false}
-                                        value={issuerData.city || ''}
+                                        value={serviceProviderData.city || ''}
                                         handleChange={handleChange}
                                     />
                                 </GridItem>
@@ -158,7 +158,7 @@ export default function IssuerProfile(props) {
                                         name={"state"}
                                         autoComplete={"state"}
                                         readOnly={false}
-                                        value={issuerData.state || ''}
+                                        value={serviceProviderData.state || ''}
                                         handleChange={handleChange}
                                     />
                                 </GridItem>
@@ -172,7 +172,7 @@ export default function IssuerProfile(props) {
                                         name={"pinCode"}
                                         autoComplete={"pinCode"}
                                         readOnly={false}
-                                        value={issuerData.pinCode || ''}
+                                        value={serviceProviderData.pinCode || ''}
                                         handleChange={handleChange}
                                     />
                                 </GridItem>
@@ -186,7 +186,7 @@ export default function IssuerProfile(props) {
                                         name={"password"}
                                         autoComplete={"password"}
                                         readOnly={false}
-                                        value={issuerData.password || ''}
+                                        value={serviceProviderData.password || ''}
                                         type={'password'}
                                         handleChange={handleChange}
                                     />

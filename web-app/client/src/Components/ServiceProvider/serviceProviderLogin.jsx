@@ -1,18 +1,18 @@
 import React, {Component} from 'react';
 import {Link, NavLink, Redirect} from 'react-router-dom';
-import './verifierLogin.css';
+import './serviceProviderLogin.css';
 import axios from 'axios';
 import {ADDRESS} from "../constants";
 import AppAside from "./AppAside";
 import FormSwitcher from "./FormSwitcher";
 
-class verifierLogin extends Component {
+class serviceProviderLogin extends Component {
     constructor(props) {
         super(props);
         localStorage.clear();
-        const verifierToken = localStorage.getItem("verifierToken");
+        const serviceProviderToken = localStorage.getItem("serviceProviderToken");
         let loggedIn = true;
-        if (verifierToken == null) {
+        if (serviceProviderToken == null) {
             loggedIn = false;
         }
         this.state = {
@@ -55,11 +55,11 @@ class verifierLogin extends Component {
         response = response.data;
 
         if (response.data !== "Incorrect" && response.data !== "Failed to verify password") {
-            let verifierToken = {
+            let serviceProviderToken = {
                 userID: this.state.userID,
                 sessionKey: response.data
             };
-            localStorage.setItem("verifierToken", JSON.stringify(verifierToken));
+            localStorage.setItem("serviceProviderToken", JSON.stringify(serviceProviderToken));
             this.setState({
                 loggedIn: true,
                 sessionKey: response.data
@@ -109,10 +109,11 @@ class verifierLogin extends Component {
                             </form>
                         </div>
                     </div>
+
                 </div>
             );
         }
     }
 }
 
-export default verifierLogin;
+export default serviceProviderLogin;
