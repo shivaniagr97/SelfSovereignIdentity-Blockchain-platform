@@ -19,6 +19,7 @@ class registerIssuer extends Component {
             pinCode: '',
             contact: '',
             email: '',
+            type: 'issuer',
             hasAgreed: false,
             SMSUpdates: false,
             isRegistered: false
@@ -52,7 +53,8 @@ class registerIssuer extends Component {
             state: this.state.state,
             pinCode: this.state.pinCode,
             contact: this.state.contact,
-            email: this.state.email
+            email: this.state.email,
+            type: this.state.type,
         };
         let response = await axios.post(ADDRESS + `createIssuer`, userDetails);
         if (typeof response.data === "object") {

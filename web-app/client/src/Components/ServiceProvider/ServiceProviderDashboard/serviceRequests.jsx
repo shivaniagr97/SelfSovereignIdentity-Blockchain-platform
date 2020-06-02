@@ -36,11 +36,11 @@ const styles = {
 
 const useStyles = makeStyles(styles);
 
-export default function IssueRequest(props) {
+export default function ServiceRequest(props) {
     const classes = useStyles();
-    localStorage.setItem("token", localStorage.getItem("issuerToken"));
-    const [userData, setUserData] = React.useState(props.issuerData);
-    const [issueRequestDetails, setIssueRequestDetails] = React.useState({});
+    localStorage.setItem("token", localStorage.getItem("serviceProviderToken"));
+    const [userData, setUserData] = React.useState(props.serviceProviderData);
+    const [serviceRequestDetails, setServiceRequestDetails] = React.useState({});
     const [requestAccessSchema, setRequestAccessSchema] = React.useState({
         requesterID: "",
         holderID: "",
@@ -48,12 +48,12 @@ export default function IssueRequest(props) {
     });
     console.log(userData);
 
-    async function fetchIssueRequestData() {
+    async function fetchServiceRequestData() {
         console.log("here");
         try {
             let payloadSchema = {
                 listType: 'issueRequests',
-                assetId: issueRequestDetails.issueRequestID,
+                assetId: serviceRequestDetails.issueRequestID,
                 sessionKey: userData.sessionKey,
                 issuerID: userData.issuerID,
                 type: "issuer",
@@ -64,7 +64,7 @@ export default function IssueRequest(props) {
             if (typeof response === 'object' && response !== []) {
                 let date = new Date(response.timeStamp * 1000);
                 response.timeStamp = date.toDateString();
-                setIssueRequestDetails(response);
+                setServiceRequestDetails(response);
                 manageIssueRequestDisplay();
             }
         } catch (e) {
@@ -75,9 +75,9 @@ export default function IssueRequest(props) {
     const handleChange = async (event) => {
         event.preventDefault();
         if (event.target.name === "issueRequestID") {
-            issueRequestDetails[event.target.name] = event.target.value;
-            setIssueRequestDetails(issueRequestDetails);
-            await fetchIssueRequestData();
+            serviceRequestDetails[event.target.name] = event.target.value;
+            setServiceRequestDetails(serviceRequestDetails);
+            await fetchServiceRequestData();
         } else {
             requestAccessSchema[event.target.name] = event.target.value;
             setRequestAccessSchema(requestAccessSchema);
@@ -96,7 +96,7 @@ export default function IssueRequest(props) {
     const submitRequest = async () => {
         console.log("here");
         try {
-            requestAccessSchema.holderID = issueRequestDetails.holderID;
+            requestAccessSchema.holderID = serviceRequestDetails.holderID;
             requestAccessSchema.requesterID = userData.issuerID;
             requestAccessSchema.sessionKey = userData.sessionKey;
             requestAccessSchema.documentsRequested = requestAccessSchema.documentsRequested.split(',');
@@ -130,18 +130,18 @@ export default function IssueRequest(props) {
                 <GridItem xs={12} sm={12} md={8}>
                     <Card>
                         <CardHeader color="primary">
-                            <h4 className={classes.cardTitleWhite}>Issue Request</h4>
+                            <h4 className={classes.cardTitleWhite}>Service Request</h4>
                         </CardHeader>
                         <CardBody>
                             <GridContainer direction={"column"} justify={"center"} alignItems="center">
                                 <GridItem xs={12} sm={12} md={8}>
                                     <FormControl>
-                                        <InputLabel id="issueRequestID">Select Issue Request</InputLabel>
+                                        <InputLabel id="issueRequestID">Select Service Request</InputLabel>
                                         <Select
                                             style={{minWidth: 300}}
                                             id="issueRequestID"
                                             name={"issueRequestID"}
-                                            value={issueRequestDetails.issuerID || ''}
+                                            value={serviceRequestDetails.issuerID || ''}
                                             onChange={handleChange}
                                         >
                                             {createIssueRequestMenuItems()}
@@ -154,15 +154,15 @@ export default function IssueRequest(props) {
                                     <GridItem xs={12} sm={12} md={5}>
                                         <Typography component="p" variant="h6" align='center'>
                                             {/*userID, issuerID, documentType, timeStamp, requestId*/}
-                                            Holder Id : {issueRequestDetails.holderID || ''}
+                                            Holder Id : {serviceRequestDetails.holderID || ''}
                                             <br/>
-                                            Time: {issueRequestDetails.timeStamp || ''}
+                                            Time: {serviceRequestDetails.timeStamp || ''}
                                             <br/>
-                                            RequestId : {issueRequestDetails.requestID || ''}
+                                            RequestId : {serviceRequestDetails.requestID || ''}
                                             <br/>
-                                            Document Type : {issueRequestDetails.documentType || ''}
+                                            Document Type : {serviceRequestDetails.documentType || ''}
                                             <br/>
-                                            Status : {issueRequestDetails.status || ''}
+                                            Status : {serviceRequestDetails.status || ''}
                                         </Typography>
                                     </GridItem>
                                     <GridItem xs={12} sm={12} md={5}>

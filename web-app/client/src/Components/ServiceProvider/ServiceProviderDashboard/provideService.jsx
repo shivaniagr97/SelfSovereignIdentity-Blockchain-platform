@@ -18,7 +18,6 @@ import MenuItem from "@material-ui/core/MenuItem";
 import Dialog from "@material-ui/core/Dialog";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
-import CustomInput from "../../../UIComponents/CustomInput/CustomInput";
 import PropTypes from "prop-types";
 
 const styles = {
@@ -78,17 +77,16 @@ SimpleDialog.propTypes = {
 };
 
 const useStyles = makeStyles(styles);
-export default function IssueIdentity(props) {
+export default function ProvideService(props) {
 
     const classes = useStyles();
-    localStorage.setItem("token", localStorage.getItem("issuerToken"));
-    const [userData, setUserData] = React.useState(props.issuerData);
+    localStorage.setItem("token", localStorage.getItem("serviceProviderToken"));
+    const [userData, setUserData] = React.useState(props.serviceProviderData);
     const [documentAccessInfo, setDocumentAccessInfo] = React.useState([]);
     const [documentId, setDocumentId] = React.useState('');
     const [currentDocument, setCurrentDocument] = React.useState({});
     const [imageURL, setImageURL] = React.useState('');
     const [open, setOpen] = React.useState(false);
-    const [selectedDocumentFile, setSelectedDocumentFile] = React.useState('');
     const [requestIdDetails, setRequestIdDetails] = React.useState([]);
     console.log(userData);
 
@@ -137,14 +135,8 @@ export default function IssueIdentity(props) {
     function handleChange(e) {
         e.preventDefault();
         console.log("handleChange");
-        if (e.target.name === 'identity') {
-            console.log(e.target.files[0]);
-            setSelectedDocumentFile(e.target.files[0]);
-        } else {
-            console.log(e.target.value);
-            setDocumentId(e.target.value);
-        }
-
+        console.log(e.target.value);
+        setDocumentId(e.target.value);
     }
 
     function createTableBody() {
@@ -169,67 +161,10 @@ export default function IssueIdentity(props) {
                         {'click here'}
                     </Button>
                 </TableCell>
-                <TableCell align="right">
-                    <CustomInput
-                        type="file"
-                        id="identity"
-                        style={{minWidth: 100}}
-                        formControlProps={{
-                            fullWidth: false
-                        }}
-                        name="identity"
-                        readOnly={false}
-                        handleChange={handleChange}
-                    />
-                </TableCell>
-                <TableCell align="right">
-                    <Button name={i} onClick={() => uploadIdentity(documentAccessInfo[i][0])}>
-                        {'click here'}
-                    </Button>
-                </TableCell>
             </TableRow>);
         }
         console.log(rows);
         return rows;
-    }
-
-
-    async function uploadIdentity(userCompleteInfo) {
-        let response = "";
-        console.log("submitDetails begins");
-        try {
-            console.log(requestIdDetails);
-            console.log(userCompleteInfo);
-            let requestID = '';
-            for (let i = 0; i < requestIdDetails.length; i++) {
-                if (userCompleteInfo.userID === requestIdDetails[i].holderID) {
-                    requestID = requestIdDetails[i].requestID;
-                    break;
-                }
-            }
-            if (requestID !== '') {
-                let data = new FormData();
-                data.append('file', selectedDocumentFile, selectedDocumentFile.name);
-                data.append('holderID', userCompleteInfo.userID);
-                data.append('time', new Date().toLocaleString());
-                data.append('documentType', userData.issuerType);
-                data.append('sessionKey', userData.sessionKey);
-                data.append('issuerID', userData.issuerID);
-                data.append('requestID', requestID);
-                console.log(data);
-                response = await axios.post(ADDRESS + `issueIdentity`, data);
-                response = response.data;
-                if (response === 'Correct') {
-                    setSelectedDocumentFile('');
-                    setDocumentId('');
-                } else {
-                    console.log(response);
-                }
-            }
-        } catch (e) {
-            //show error message
-            console.log(e);
-        }
     }
 
 
@@ -288,7 +223,7 @@ export default function IssueIdentity(props) {
                 <GridItem xs={12} sm={12} md={8}>
                     <Card>
                         <CardHeader color="primary">
-                            <h4 className={classes.cardTitleWhite}>Issue Identity</h4>
+                            <h4 className={classes.cardTitleWhite}>Provide Service</h4>
                         </CardHeader>
                         <CardBody>
 
@@ -299,8 +234,6 @@ export default function IssueIdentity(props) {
                                         <TableCell style={{fontWeight: 'bold'}}>User Name</TableCell>
                                         <TableCell style={{fontWeight: 'bold'}}>Documents</TableCell>
                                         <TableCell style={{fontWeight: 'bold'}}>View Documents</TableCell>
-                                        <TableCell style={{fontWeight: 'bold'}}>Select Identity</TableCell>
-                                        <TableCell style={{fontWeight: 'bold'}}>Upload Identity</TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>

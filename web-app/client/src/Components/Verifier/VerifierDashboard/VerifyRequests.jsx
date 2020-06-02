@@ -13,12 +13,9 @@ import TableCell from "@material-ui/core/TableCell";
 import Table from "@material-ui/core/Table";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
-import Select from "@material-ui/core/Select";
-import MenuItem from "@material-ui/core/MenuItem";
 import Dialog from "@material-ui/core/Dialog";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
-import CustomInput from "../../../UIComponents/CustomInput/CustomInput";
 import PropTypes from "prop-types";
 
 const styles = {
@@ -78,17 +75,16 @@ SimpleDialog.propTypes = {
 };
 
 const useStyles = makeStyles(styles);
-export default function IssueIdentity(props) {
+export default function VerifyRequests(props) {
 
     const classes = useStyles();
-    localStorage.setItem("token", localStorage.getItem("issuerToken"));
-    const [userData, setUserData] = React.useState(props.issuerData);
+    localStorage.setItem("token", localStorage.getItem("verifierToken"));
+    const [userData, setUserData] = React.useState(props.verifierData);
     const [documentAccessInfo, setDocumentAccessInfo] = React.useState([]);
     const [documentId, setDocumentId] = React.useState('');
     const [currentDocument, setCurrentDocument] = React.useState({});
     const [imageURL, setImageURL] = React.useState('');
     const [open, setOpen] = React.useState(false);
-    const [selectedDocumentFile, setSelectedDocumentFile] = React.useState('');
     const [requestIdDetails, setRequestIdDetails] = React.useState([]);
     console.log(userData);
 
@@ -99,8 +95,8 @@ export default function IssueIdentity(props) {
                     listType: 'accessDocumentInfo',
                     accessDocumentInfo: Object.keys(userData.accessDocumentInfo),
                     sessionKey: userData.sessionKey,
-                    issuerID: userData.issuerID,
-                    type: "issuer",
+                    verifierID: userData.verifierID,
+                    type: "verifier",
                 };
                 let response = await axios.post(ADDRESS + `readIndividualAsset`, payloadSchema);
                 response = response.data;
@@ -109,10 +105,10 @@ export default function IssueIdentity(props) {
                     setDocumentAccessInfo(response);
                 }
                 //fetch all the requestIds from the backend was bored so didnt change the backend hehe
-                payloadSchema.listType = 'issueRequests';
-                payloadSchema.issueRequests = userData.issueRequests;
-                for (let i = 0; i < userData.issueRequests.length; i++) {
-                    payloadSchema.assetId = userData.issueRequests[i];
+                payloadSchema.listType = 'verifyRequests';
+                delete payloadSchema.accessDocumentInfo;
+                for (let i = 0; i < userData.verifyRequests.length; i++) {
+                    payloadSchema.assetId = userData.verifyRequests[i];
                     response = await axios.post(ADDRESS + `readIndividualAsset`, payloadSchema);
                     response = response.data;
                     console.log(response);
@@ -137,53 +133,50 @@ export default function IssueIdentity(props) {
     function handleChange(e) {
         e.preventDefault();
         console.log("handleChange");
-        if (e.target.name === 'identity') {
-            console.log(e.target.files[0]);
-            setSelectedDocumentFile(e.target.files[0]);
-        } else {
-            console.log(e.target.value);
-            setDocumentId(e.target.value);
-        }
+        console.log(e.target.value);
+        setDocumentId(e.target.value);
 
+    }
+
+    function checkAndFetchVerifyRequest(userID, documentID) {
+        console.log("checkAndFetchVerifyRequest");
+        for (let i = 0; i < requestIdDetails.length; i++) {
+            console.log(requestIdDetails[i].documentID + " " + documentID + " " + requestIdDetails.holderID + " " + userID);
+            if (requestIdDetails[i].documentID === documentID && requestIdDetails[i].holderID === userID) {
+                return requestIdDetails[i].requestID;
+            }
+        }
+        return -1;
     }
 
     function createTableBody() {
         let rows = [];
         for (let i = 0; i < documentAccessInfo.length; i++) {
+            //first match the request id to the proper requester Id once done we will display and verify identity
+            console.log("create Body Table");
+            console.log(documentAccessInfo);
+            if (documentAccessInfo[i].length === 1) {
+                continue;
+            }
+            //fetch the request ID and match all the details
+            console.log(requestIdDetails);
+            let requestID = checkAndFetchVerifyRequest(documentAccessInfo[i][0].userID, documentAccessInfo[i][1].documentID);
+            if (requestID === -1) {
+                continue;
+            }
+            console.log(requestID);
             rows.push(<TableRow key={i}>
+                <TableCell>{requestID}</TableCell>
                 <TableCell>{documentAccessInfo[i][0].userID}</TableCell>
                 <TableCell>{documentAccessInfo[i][0].firstName + " " + documentAccessInfo[i][0].lastName}</TableCell>
-                <TableCell>
-                    <Select
-                        style={{minWidth: 100}}
-                        id="documentID"
-                        name={"documentID"}
-                        value={documentId}
-                        onChange={handleChange}
-                    >
-                        {createMenuItems(documentAccessInfo[i])}
-                    </Select>
-                </TableCell>
+                <TableCell>{documentAccessInfo[i][1].documentID}</TableCell>
                 <TableCell align="right">
-                    <Button name={i} onClick={() => displayDocument(documentAccessInfo[i])}>
+                    <Button name={i} style={{minWidth:70}} onClick={() => displayDocument(documentAccessInfo[i])}>
                         {'click here'}
                     </Button>
                 </TableCell>
                 <TableCell align="right">
-                    <CustomInput
-                        type="file"
-                        id="identity"
-                        style={{minWidth: 100}}
-                        formControlProps={{
-                            fullWidth: false
-                        }}
-                        name="identity"
-                        readOnly={false}
-                        handleChange={handleChange}
-                    />
-                </TableCell>
-                <TableCell align="right">
-                    <Button name={i} onClick={() => uploadIdentity(documentAccessInfo[i][0])}>
+                    <Button name={i} style={{minWidth:70}} onClick={() => VerifyIdentityRequest(documentAccessInfo[i])}>
                         {'click here'}
                     </Button>
                 </TableCell>
@@ -194,7 +187,7 @@ export default function IssueIdentity(props) {
     }
 
 
-    async function uploadIdentity(userCompleteInfo) {
+    async function VerifyIdentityRequest(userCompleteInfo) {
         let response = "";
         console.log("submitDetails begins");
         try {
@@ -202,25 +195,22 @@ export default function IssueIdentity(props) {
             console.log(userCompleteInfo);
             let requestID = '';
             for (let i = 0; i < requestIdDetails.length; i++) {
-                if (userCompleteInfo.userID === requestIdDetails[i].holderID) {
+                if (userCompleteInfo[0].userID === requestIdDetails[i].holderID) {
                     requestID = requestIdDetails[i].requestID;
                     break;
                 }
             }
             if (requestID !== '') {
-                let data = new FormData();
-                data.append('file', selectedDocumentFile, selectedDocumentFile.name);
-                data.append('holderID', userCompleteInfo.userID);
-                data.append('time', new Date().toLocaleString());
-                data.append('documentType', userData.issuerType);
-                data.append('sessionKey', userData.sessionKey);
-                data.append('issuerID', userData.issuerID);
-                data.append('requestID', requestID);
-                console.log(data);
-                response = await axios.post(ADDRESS + `issueIdentity`, data);
+                let payloadSchema = {
+                    sessionKey: userData.sessionKey,
+                    verifierID: userData.verifierID,
+                    documentID: userCompleteInfo[1].documentID,
+                    requestID: requestID
+                };
+                console.log(payloadSchema);
+                response = await axios.post(ADDRESS + `verifyIdentity`, payloadSchema);
                 response = response.data;
                 if (response === 'Correct') {
-                    setSelectedDocumentFile('');
                     setDocumentId('');
                 } else {
                     console.log(response);
@@ -232,37 +222,16 @@ export default function IssueIdentity(props) {
         }
     }
 
-
-    function createMenuItems(userInfo) {
-        console.log("creteMenuItems");
-        let items = [];
-        for (let i = 1; i < userInfo.length; i++) {
-            let documentId = userInfo[i].documentID;
-            items.push(
-                <MenuItem key={i} value={documentId}>
-                    {documentId}
-                </MenuItem>);
-        }
-        return items;
-    }
-
     async function displayDocument(UserCompleteInfo) {
-        let documentInfo = {};
-        for (let i = 1; i < UserCompleteInfo.length; i++) {
-            if (documentId === UserCompleteInfo[i].documentID) {
-                documentInfo = UserCompleteInfo[i];
-                break;
-            }
-        }
-        console.log(documentInfo);
+        console.log(UserCompleteInfo[1]);
         console.log("display Document");
         try {
             let fileSchema = {
-                documentId: documentId,
-                userID: documentInfo.holderID,
+                documentId: UserCompleteInfo[1].documentID,
+                userID: UserCompleteInfo[1].holderID,
                 sessionKey: userData.sessionKey,
-                type: documentInfo.documentType,
-                id: userData.issuerID
+                type: UserCompleteInfo[1].documentType,
+                id: userData.verifierID
             };
             await axios.post(ADDRESS + `fetchFileFromDatabase`, fileSchema, {responseType: "blob"})
                 .then(res => {
@@ -271,7 +240,7 @@ export default function IssueIdentity(props) {
                     console.log(url);
                     setImageURL(url);
                     setOpen(true);
-                    setCurrentDocument(documentInfo);
+                    setCurrentDocument(UserCompleteInfo[1]);
                 });
         } catch (e) {
             console.log(e);
@@ -285,22 +254,22 @@ export default function IssueIdentity(props) {
     return (
         <div>
             <GridContainer>
-                <GridItem xs={12} sm={12} md={8}>
+                <GridItem xs={12} sm={12} md={9}>
                     <Card>
                         <CardHeader color="primary">
-                            <h4 className={classes.cardTitleWhite}>Issue Identity</h4>
+                            <h4 className={classes.cardTitleWhite}>Verify Request</h4>
                         </CardHeader>
                         <CardBody>
 
                             <Table size="medium">
                                 <TableHead>
                                     <TableRow>
+                                        <TableCell style={{fontWeight: 'bold'}}>Request Id</TableCell>
                                         <TableCell style={{fontWeight: 'bold'}}>User Id</TableCell>
                                         <TableCell style={{fontWeight: 'bold'}}>User Name</TableCell>
-                                        <TableCell style={{fontWeight: 'bold'}}>Documents</TableCell>
-                                        <TableCell style={{fontWeight: 'bold'}}>View Documents</TableCell>
-                                        <TableCell style={{fontWeight: 'bold'}}>Select Identity</TableCell>
-                                        <TableCell style={{fontWeight: 'bold'}}>Upload Identity</TableCell>
+                                        <TableCell style={{fontWeight: 'bold'}}>Document Id</TableCell>
+                                        <TableCell style={{fontWeight: 'bold'}}>View Document</TableCell>
+                                        <TableCell style={{fontWeight: 'bold'}}>Verify Identity</TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>

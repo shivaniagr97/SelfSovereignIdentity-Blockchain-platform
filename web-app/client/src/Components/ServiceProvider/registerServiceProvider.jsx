@@ -21,6 +21,7 @@ class registerServiceProvider extends Component {
             email: '',
             hasAgreed: false,
             SMSUpdates: false,
+            type: 'serviceProvider',
             isRegistered: false
         };
 
@@ -52,7 +53,8 @@ class registerServiceProvider extends Component {
             state: this.state.state,
             pinCode: this.state.pinCode,
             contact: this.state.contact,
-            email: this.state.email
+            email: this.state.email,
+            type: this.state.type,
         };
         let response = await axios.post(ADDRESS + `createIssuer`, userDetails);
         if (typeof response.data === "object") {
@@ -97,8 +99,10 @@ class registerServiceProvider extends Component {
                                            onChange={this.handleChange}/>
                                 </div>
                                 <div className="FormField">
-                                    <label className="FormField__Label" htmlFor="serviceProviderType">Service Type</label>
-                                    <input type="serviceProviderType" id="serviceProviderType" className="FormField__Input"
+                                    <label className="FormField__Label" htmlFor="serviceProviderType">Service
+                                        Type</label>
+                                    <input type="serviceProviderType" id="serviceProviderType"
+                                           className="FormField__Input"
                                            placeholder="Enter your service type"
                                            name="serviceProviderType" value={this.state.serviceProviderType}
                                            onChange={this.handleChange}/>

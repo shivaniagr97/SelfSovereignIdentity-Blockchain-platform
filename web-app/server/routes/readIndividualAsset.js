@@ -42,7 +42,8 @@ router.post('/', async (req, res) => {
             if (req.body.type === 'verifier') {
                 console.log("verifier side");
                 if (req.body.listType === "verifyRequests") {
-                    response = await contract.submitTransaction('readIssuerAssets', JSON.stringify(req.body));
+                    console.log(req.body);
+                    response = await contract.submitTransaction('readVerifierAssets', JSON.stringify(req.body));
                     response = JSON.parse(response.toString());
                     console.log(response);
                 } else {

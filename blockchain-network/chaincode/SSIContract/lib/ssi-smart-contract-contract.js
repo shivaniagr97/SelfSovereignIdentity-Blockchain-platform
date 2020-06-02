@@ -205,6 +205,7 @@ class SsiSmartContractContract extends Contract {
             args.pinCode, args.contact, args.email);
         issuer.issueRequests = issueRequests;
         issuer.accessDocumentInfo = accessDocumentInfo;
+        issuer.type = args.type;
 
         await ctx.stub.putState(issuer.issuerID, Buffer.from(JSON.stringify(issuer)));
 
@@ -326,6 +327,14 @@ class SsiSmartContractContract extends Contract {
      */
     async readVerifierAssets(ctx, args) {
         args = JSON.parse(args);
+        //{ listType: 'verifyRequests',
+        //   accessDocumentInfo: [ 'rahulparihar' ],
+        //   sessionKey: '68f5cf79c6572c28795e4fef2ec244c743551bd7ba1df9390fbe26ebc3b25d64',
+        //   verifierID: 'amitsharma',
+        //   type: 'verifier',
+        //   verifyRequests: [ '2fkrr08uskd50y1ewyxmlc' ],
+        //   assetId: '2fkrr08uskd50y1ewyxmlc',
+        //   id: 'amitsharma' }
         let verifierExists = await this.assetExists(ctx, args.verifierID);
         if (verifierExists) {
             let verifierAsBytes = await ctx.stub.getState(args.verifierID);
@@ -553,11 +562,13 @@ class SsiSmartContractContract extends Contract {
      * @param ctx
      * @param documentID
      * @param verifierID
+     * @param requestID
      * @returns {Promise<string>}
      */
-    async verifyIdentity(ctx, documentID, verifierID) {
+    async verifyIdentity(ctx, documentID, verifierID, requestID) {
         let documentExists = await this.assetExists(ctx, documentID);
         let verifierExists = await this.assetExists(ctx, verifierID);
+        let requestExists = await this.assetExists(ctx, requestID);
 
         if (!documentExists) {
             throw new Error(`Identity with document id ${documentID} does not exist`);
@@ -565,6 +576,9 @@ class SsiSmartContractContract extends Contract {
 
         if (!verifierExists) {
             throw new Error(`Verifier id ${verifierID} is invalid`);
+        }
+        if (!requestExists) {
+            throw new Error(`request id ${requestID} is invalid`);
         }
 
         let identityAsBytes = await ctx.stub.getState(documentID);
@@ -579,6 +593,26 @@ class SsiSmartContractContract extends Contract {
         identity.verifierID = verifierID;
 
         await ctx.stub.putState(identity.documentID, Buffer.from(JSON.stringify(identity)));
+        //delete the access for the document given after verification as well as remove the request ID in order to ensure the smooth flow
+        let index = verifier.verifyRequests.indexOf(requestID);
+        if (index > -1) {
+            verifier.verifyRequests.splice(index, 1);
+            delete verifier.accessDocumentInfo[identity.holderID];
+        }
+
+        let holderAsBytes = await ctx.stub.getState(identity.holderID);
+        let holder = JSON.parse(holderAsBytes);
+        index = holder.verifyRequests.indexOf(requestID);
+        if (index > -1) {
+            holder.verifyRequests.splice(index, 1);
+        }
+
+        if (holder.accessRights.hasOwnProperty(documentID)) {
+            index = holder.accessRights[documentID].indexOf(verifierID);
+            if (index > -1) {
+                holder.accessRights[documentID].splice(index, 1);
+            }
+        }
 
         let response = `Identity with document id ${identity.documentID} is verified by verifier id ${verifierID}
          and updated in the world state`;

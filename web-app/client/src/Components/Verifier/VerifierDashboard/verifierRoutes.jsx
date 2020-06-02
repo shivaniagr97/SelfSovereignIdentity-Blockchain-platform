@@ -18,24 +18,12 @@
 // @material-ui/icons
 import Dashboard from "@material-ui/icons/Dashboard";
 import Person from "@material-ui/icons/Person";
-import ArrowUpward from "@material-ui/icons/ArrowUpward"
 import LibraryBooks from "@material-ui/icons/LibraryBooks";
-import BubbleChart from "@material-ui/icons/BubbleChart";
-import LocationOn from "@material-ui/icons/LocationOn";
-import Notifications from "@material-ui/icons/Notifications";
-import Unarchive from "@material-ui/icons/Unarchive";
-import Language from "@material-ui/icons/Language";
 // core components/views for Admin layout
 import DashboardPage from "./DashboardPage.jsx";
 import VerifierProfile from "./VerifierProfile.jsx";
-// import TableList from "views/TableList/TableList.js";
-// import Typography from "views/Typography/Typography.js";
-// import Icons from "views/Icons/Icons.js";
-// import Maps from "views/Maps/Maps.js";
-// import NotificationsPage from "views/Notifications/Notifications.js";
-// import UpgradeToPro from "views/UpgradeToPro/UpgradeToPro.js";
-// core components/views for RTL layout
-// import RTLPage from "views/RTLPage/RTLPage.js";
+import VerifyRequests from "./VerifyRequests";
+
 
 const dashboardRoutes = [
     {
@@ -52,6 +40,14 @@ const dashboardRoutes = [
         rtlName: "ملف تعريفي للمستخدم",
         icon: Person,
         component: VerifierProfile,
+        layout: "/home"
+    },
+    {
+        path: "/verifyRequests",
+        name: "Verifier Profile",
+        rtlName: "ملف تعريفي للمستخدم",
+        icon: LibraryBooks,
+        component: VerifyRequests,
         layout: "/home"
     }
     // {

@@ -57,6 +57,16 @@ router.post('/', async (req, res) => {
                     };
                     response = await contract.evaluateTransaction('queryWithQueryString', JSON.stringify(queryString));
                     response = JSON.parse(response.toString());
+                } else if (requestType === 'serviceProvider') {
+                    let queryString = {
+                        "selector": {
+                            "type": requestType,
+                        }
+                    };
+                    console.log(queryString);
+                    response = await contract.evaluateTransaction('queryWithQueryString', JSON.stringify(queryString));
+                    response = JSON.parse(response.toString());
+                    console.log(response);
                 }
                 for (let i = 0; i < response.length; i++) {
                     delete response[i].Record.password;

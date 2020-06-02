@@ -21,6 +21,7 @@ import Person from "@material-ui/icons/Person";
 import ArrowUpward from "@material-ui/icons/ArrowUpward"
 import LibraryBooks from "@material-ui/icons/LibraryBooks";
 import ContactsIcon from '@material-ui/icons/Contacts';
+import PlaylistAddCheckIcon from '@material-ui/icons/PlaylistAddCheck';
 
 // core components/views for Admin layout
 import DashboardPage from "./DashboardPage.jsx";
@@ -30,7 +31,7 @@ import ViewDocuments from "./ViewDocuments";
 import IssueRequest from "./issueRequest";
 import VerifyRequest from "./verifyRequest";
 import ManageAccess from "./manageAccess";
-
+import ServiceRequest from "./serviceRequest";
 
 const dashboardRoutes = [
     {
@@ -66,6 +67,14 @@ const dashboardRoutes = [
         layout: "/home"
     },
     {
+        path: "/manageAccess",
+        name: "Manage Access",
+        rtlName: "طلب إصدار",
+        icon: PlaylistAddCheckIcon,
+        component: ManageAccess,
+        layout: "/home"
+    },
+    {
         path: "/issueRequest",
         name: "Issue Request",
         rtlName: "طلب إصدار",
@@ -82,11 +91,11 @@ const dashboardRoutes = [
         layout: "/home"
     },
     {
-        path: "/manageAccess",
-        name: "Manage Access",
+        path: "/serviceRequest",
+        name: "Service Request",
         rtlName: "طلب إصدار",
         icon: ContactsIcon,
-        component: ManageAccess,
+        component: ServiceRequest,
         layout: "/home"
     }
     // {

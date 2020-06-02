@@ -3,6 +3,7 @@ const router = express.Router();
 
 const {FileSystemWallet, Gateway, X509WalletMixin} = require('fabric-network');
 const path = require('path');
+var handler = require('./sessionKeyHandler');
 
 const ccpPath = path.resolve(__dirname, '..', '..', '..', 'blockchain-network', 'first-network', 'connection-org1.json');
 
@@ -36,7 +37,7 @@ router.post('/', async (req, res) => {
             const contract = network.getContract('SSIContract');
 
             // Submit the specified transaction.
-            let response = await contract.submitTransaction('verifyIdentity', req.body.documentID, req.body.verifierID);
+            let response = await contract.submitTransaction('verifyIdentity', req.body.documentID, req.body.verifierID, req.body.requestID);
             response = JSON.stringify(response.toString());
             console.log(response);
 

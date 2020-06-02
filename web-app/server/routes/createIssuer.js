@@ -100,6 +100,7 @@ async function registerInLedger(req) {
         const contract = network.getContract('SSIContract');
 
         // Submit the specified transaction.
+        console.log(req.body);
         let response = await contract.submitTransaction('createIssuer', JSON.stringify(req.body));
         response = JSON.stringify(response.toString());
         console.log(response);

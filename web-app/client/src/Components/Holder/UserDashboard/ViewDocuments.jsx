@@ -193,11 +193,12 @@ export default function ViewDocuments(props) {
     function createUploadedTableBody() {
         let rows = [];
         for (let i = 0; i < uploadedDocumentsDetails.length; i++) {
+            console.log(uploadedDocumentsDetails);
             rows.push(
                 <TableRow key={i}>
                     <TableCell>{(uploadedDocumentsDetails[i].documentType)}</TableCell>
                     <TableCell>{uploadedDocumentsDetails[i].documentID}</TableCell>
-                    <TableCell>{(uploadedDocumentsDetails[i].verfierID) || "Not Verified"}</TableCell>
+                    <TableCell>{(uploadedDocumentsDetails[i].verifierID) || "Not Verified"}</TableCell>
                     <TableCell><Button name={i}
                                        onClick={() => displayDocument(uploadedDocumentsDetails[i])}>
                         {'View Document'}
